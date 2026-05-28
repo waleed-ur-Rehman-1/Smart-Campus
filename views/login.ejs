@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | City University</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #080e1c;
+            --navy-2: #0c1525;
+            --navy-3: #101d33;
+            --gold: #c9a84c;
+            --gold-light: #e8c97a;
+            --gold-pale: rgba(201, 168, 76, 0.12);
+            --gold-border: rgba(201, 168, 76, 0.22);
+            --white: #ffffff;
+            --text: rgba(255, 255, 255, 0.82);
+            --text-muted: rgba(255, 255, 255, 0.42);
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-hover: rgba(255, 255, 255, 0.07);
+            --card-border: rgba(255, 255, 255, 0.07);
+            --success: #2ecc82;
+            --danger: #e05c5c;
+            --warning: #f0a845;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ═══ VIDEO BACKGROUND ══════════════════════════════════════ */
+        .bg-video-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-video-wrap video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.15;
+            filter: saturate(0.3) brightness(0.4);
+        }
+
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(201, 168, 76, 0.08) 0%, transparent 55%),
+                        radial-gradient(ellipse 60% 80% at 80% 80%, rgba(11, 28, 58, 0.95) 0%, transparent 60%),
+                        linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 50%, var(--navy) 100%);
+        }
+
+        .bg-grain {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px;
+            pointer-events: none;
+        }
+
+        /* ═══ MAIN CONTAINER ═══════════════════════════════════════ */
+        .login-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* ═══ LOGIN CARD ═══════════════════════════════════════════ */
+        .login-card {
+            max-width: 480px;
+            width: 100%;
+            background: rgba(8, 14, 28, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--gold-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .login-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 30px 60px -12px rgba(201, 168, 76, 0.15);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ═══ LOGO SECTION ════════════════════════════════════════ */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-emblem {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1rem;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gold);
+            position: relative;
+            background: rgba(201, 168, 76, 0.05);
+        }
+
+        .logo-emblem::after {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            border-radius: 50%;
+        }
+
+        .logo-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--white);
+            letter-spacing: -0.02em;
+        }
+
+        .logo-text span {
+            color: var(--gold);
+        }
+
+        .logo-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        /* ═══ FORM STYLES ═════════════════════════════════════════ */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--white);
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* ═══ OPTIONS ROW ═════════════════════════════════════════ */
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .checkbox-label input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--gold);
+        }
+
+        .forgot-link {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .forgot-link:hover {
+            color: var(--gold-light);
+        }
+
+        /* ═══ BUTTONS ═════════════════════════════════════════════ */
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--navy);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(201, 168, 76, 0.3);
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        /* ═══ DIVIDER ═════════════════════════════════════════════ */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .divider::before {
+            margin-right: 1rem;
+        }
+
+        .divider::after {
+            margin-left: 1rem;
+        }
+
+        /* ═══ REGISTER LINK ═══════════════════════════════════════ */
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .register-link a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .register-link a:hover {
+            color: var(--gold-light);
+        }
+
+        /* ═══ DEMO INFO ═══════════════════════════════════════════ */
+        .demo-info {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        .demo-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-info p {
+            margin: 0.25rem 0;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+        }
+
+        .demo-info strong {
+            color: var(--gold-light);
+        }
+
+        /* ═══ ERROR MESSAGE ═══════════════════════════════════════ */
+        .error-message {
+            background: rgba(224, 92, 92, 0.15);
+            border: 1px solid rgba(224, 92, 92, 0.3);
+            color: var(--danger);
+            padding: 0.75rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* ═══ LOADING STATE ═══════════════════════════════════════ */
+        .btn-login.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn-login.loading::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            top: 50%;
+            left: 50%;
+            margin-left: -9px;
+            margin-top: -9px;
+            border: 2px solid var(--navy);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ═══ RESPONSIVE ═════════════════════════════════════════ */
+        @media (max-width: 560px) {
+            .login-card {
+                padding: 1.5rem;
+            }
+            
+            .logo-text {
+                font-size: 1.5rem;
+            }
+            
+            .logo-emblem {
+                width: 55px;
+                height: 55px;
+                font-size: 1.4rem;
+            }
+        }
+
+        /* ═══ ANIMATIONS ═════════════════════════════════════════ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ VIDEO BACKGROUND ══════════════════════════════════════ -->
+    <div class="bg-video-wrap">
+        <video autoplay muted loop playsinline preload="auto" id="bgVideo">
+            <source src="/videos/campus-admin.mp4" type="video/mp4">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-set-of-gold-jewelry-32825-large.mp4" type="video/mp4">
+        </video>
+        <div class="bg-overlay"></div>
+    </div>
+    <div class="bg-grain"></div>
+
+    <div class="login-wrapper">
+        <div class="login-card reveal">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="logo-emblem">SC</div>
+                <div class="logo-text">Smart<span>Campus</span></div>
+                <div class="logo-subtitle">City University of Science & IT</div>
+            </div>
+
+            <!-- Login Title -->
+            <h2 style="text-align: center; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 500; color: var(--white); margin-bottom: 1.5rem;">
+                Welcome Back
+            </h2>
+
+            <!-- Error Message -->
+            <% if (error) { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
+
+            <!-- Login Form -->
+            <form action="/login" method="POST" id="loginForm">
+                <div class="form-group">
+                    <label class="input-label">Email Address</label>
+                    <input type="email" name="email" class="input-field" required 
+                           placeholder="admin@cityuniversity.edu" value="admin@cityuniversity.edu">
+                </div>
+                
+                <div class="form-group">
+                    <label class="input-label">Password</label>
+                    <input type="password" name="password" class="input-field" required 
+                           placeholder="Enter your password" value="admin123">
+                </div>
+
+                <div class="options-row">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <a href="#" class="forgot-link" onclick="showForgotPassword(); return false;">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
+            </form>
+
+            <div class="divider">or</div>
+
+            <!-- Register Link -->
+            <div class="register-link">
+                Don't have an account? <a href="/register">Create Account</a>
+            </div>
+
+            <!-- Demo Info -->
+            <div class="demo-info">
+                <div class="demo-title">🔐 Demo Credentials</div>
+                <p><strong>Admin:</strong> admin@cityuniversity.edu / admin123</p>
+                <p><strong>Student:</strong> Register as new student or use registered email</p>
+                <p style="margin-top: 0.5rem; font-size: 0.65rem;">✨ Experience the SmartCampus Portal</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle video background errors
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('bgVideo');
+            if (video) {
+                video.play().catch(function(e) {
+                    console.log('Auto-play prevented or video not found');
+                    video.style.display = 'none';
+                });
+                
+                video.addEventListener('error', function() {
+                    this.style.display = 'none';
+                });
+            }
+        });
+
+        // Scroll reveal animation
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        revealElements.forEach(el => observer.observe(el));
+
+        // Form loading state
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('loginBtn');
+            btn.classList.add('loading');
+            btn.textContent = 'Signing In...';
+            
+            // If there's an error, the page will reload with error message
+            // This just shows loading state until redirect
+        });
+
+        // Forgot password function
+        function showForgotPassword() {
+            alert('Please contact the IT department at support@cityuniversity.edu to reset your password.\n\nOr use demo credentials:\nAdmin: admin@cityuniversity.edu / admin123');
+        }
+
+        // Optional: Add floating particles effect
+        function createParticles() {
+            const particlesContainer = document.createElement('div');
+            particlesContainer.style.position = 'fixed';
+            particlesContainer.style.top = '0';
+            particlesContainer.style.left = '0';
+            particlesContainer.style.width = '100%';
+            particlesContainer.style.height = '100%';
+            particlesContainer.style.pointerEvents = 'none';
+            particlesContainer.style.zIndex = '0';
+            particlesContainer.style.overflow = 'hidden';
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = Math.random() * 3 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.background = 'rgba(201, 168, 76, 0.3)';
+                particle.style.borderRadius = '50%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animation = `float ${Math.random() * 10 + 5}s linear infinite`;
+                particle.style.opacity = Math.random() * 0.3;
+                particlesContainer.appendChild(particle);
+            }
+            
+            document.body.appendChild(particlesContainer);
+        }
+        
+        // Add floating animation style
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0% {
+                    transform: translateY(0) translateX(0);
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 0.3;
+                }
+                100% {
+                    transform: translateY(-100vh) translateX(20px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Uncomment to enable particles effect
+        // createParticles();
+    </script>
+</body>
+</html>

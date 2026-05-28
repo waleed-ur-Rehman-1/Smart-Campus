@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FYP Management | Smart Campus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #080e1c;
+            --navy-2: #0c1525;
+            --navy-3: #101d33;
+            --navy-4: #162440;
+            --gold: #c9a84c;
+            --gold-light: #e8c97a;
+            --gold-pale: rgba(201, 168, 76, 0.12);
+            --gold-border: rgba(201, 168, 76, 0.22);
+            --white: #ffffff;
+            --text: rgba(255, 255, 255, 0.82);
+            --text-muted: rgba(255, 255, 255, 0.42);
+            --text-faint: rgba(255, 255, 255, 0.18);
+            --success: #2ecc82;
+            --success-bg: rgba(46, 204, 130, 0.12);
+            --danger: #e05c5c;
+            --danger-bg: rgba(224, 92, 92, 0.12);
+            --warning: #f0a845;
+            --warning-bg: rgba(240, 168, 69, 0.12);
+            --info: #5b9cf6;
+            --info-bg: rgba(91, 156, 246, 0.12);
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-hover: rgba(255, 255, 255, 0.07);
+            --card-border: rgba(255, 255, 255, 0.07);
+            --topbar-h: 70px;
+            --shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--navy);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ═══ VIDEO BACKGROUND ══════════════════════════════════════ */
+        .bg-video-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-video-wrap video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.12;
+            filter: saturate(0.3) brightness(0.35);
+        }
+
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(201, 168, 76, 0.06) 0%, transparent 55%),
+                        radial-gradient(ellipse 60% 80% at 80% 80%, rgba(11, 28, 58, 0.95) 0%, transparent 60%),
+                        linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 50%, var(--navy) 100%);
+        }
+
+        .bg-grain {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px;
+            pointer-events: none;
+        }
+
+        /* ═══ TOPBAR ═══════════════════════════════════════════════ */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-h);
+            z-index: 100;
+            background: rgba(8, 14, 28, 0.85);
+            border-bottom: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo-emblem {
+            width: 38px;
+            height: 38px;
+            border: 1.5px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .logo-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .logo-text span {
+            color: var(--gold);
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--gold);
+        }
+
+        .logout-btn {
+            background: rgba(224, 92, 92, 0.15);
+            border: 1px solid rgba(224, 92, 92, 0.3);
+            color: var(--danger);
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(224, 92, 92, 0.25);
+            border-color: var(--danger);
+        }
+
+        /* ═══ MAIN CONTAINER ═══════════════════════════════════════ */
+        .main {
+            margin-top: var(--topbar-h);
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ═══ HERO SECTION ════════════════════════════════════════ */
+        .hero-section {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.08), rgba(201, 168, 76, 0.02));
+            border: 1px solid var(--gold-border);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(201, 168, 76, 0.08), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--gold-pale);
+            border: 1px solid var(--gold-border);
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--gold-light);
+            margin-top: 0.5rem;
+        }
+
+        /* ═══ STATS GRID ══════════════════════════════════════════ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.3rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gold);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat-card:hover {
+            background: var(--glass-hover);
+            border-color: var(--gold-border);
+            transform: translateY(-4px);
+        }
+
+        .stat-card:hover::before {
+            opacity: 0.7;
+        }
+
+        .stat-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .stat-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* ═══ TABS ════════════════════════════════════════════════ */
+        .tabs-container {
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0 0.5rem;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.3s;
+            position: relative;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .tab:hover {
+            color: var(--gold-light);
+        }
+
+        .tab.active {
+            color: var(--gold);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 1rem;
+            right: 1rem;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        .tab-content {
+            padding: 1.5rem;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══ CARDS ═══════════════════════════════════════════════ */
+        .form-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .form-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--white);
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: var(--text-faint);
+        }
+
+        /* ═══ BUTTONS ═════════════════════════════════════════════ */
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: var(--navy);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(201, 168, 76, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gold-border);
+            color: var(--gold);
+        }
+
+        .btn-outline:hover {
+            background: var(--gold-pale);
+            border-color: var(--gold);
+        }
+
+        .btn-success {
+            background: var(--success-bg);
+            border: 1px solid rgba(46, 204, 130, 0.3);
+            color: var(--success);
+        }
+
+        .btn-danger {
+            background: var(--danger-bg);
+            border: 1px solid rgba(224, 92, 92, 0.3);
+            color: var(--danger);
+        }
+
+        /* ═══ MILESTONE ITEMS ═════════════════════════════════════ */
+        .milestone-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .milestone-item:hover {
+            border-color: var(--gold-border);
+            transform: translateX(4px);
+        }
+
+        .milestone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .milestone-title {
+            font-weight: 600;
+            color: var(--white);
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .badge-pending { background: var(--warning-bg); color: var(--warning); }
+        .badge-completed { background: var(--success-bg); color: var(--success); }
+        .badge-approved { background: var(--success-bg); color: var(--success); }
+        .badge-rejected { background: var(--danger-bg); color: var(--danger); }
+        .badge-progress { background: var(--info-bg); color: var(--info); }
+
+        /* ═══ MEMBER LIST ═════════════════════════════════════════ */
+        .member-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .member-tag {
+            background: var(--gold-pale);
+            border: 1px solid var(--gold-border);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: var(--gold-light);
+        }
+
+        /* ═══ FILE UPLOAD ═════════════════════════════════════════ */
+        .file-upload-area {
+            border: 2px dashed var(--card-border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--gold);
+            background: var(--gold-pale);
+        }
+
+        .file-upload-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-text {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* ═══ MODAL ═══════════════════════════════════════════════ */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: rgba(8, 14, 28, 0.95);
+            border: 1px solid var(--gold-border);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+        }
+
+        /* ═══ TOAST ═══════════════════════════════════════════════ */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ═══ LOADING ═════════════════════════════════════════════ */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--card-border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ═══ RESPONSIVE ══════════════════════════════════════════ */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .main { padding: 1rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .topbar { padding: 0 1rem; }
+            .topbar-nav { gap: 1rem; }
+            .nav-link { font-size: 0.75rem; }
+            .tabs { flex-wrap: wrap; }
+            .tab { padding: 0.75rem 1rem; }
+            .hero-title { font-size: 1.5rem; }
+        }
+
+        /* ═══ SCROLLBAR ═══════════════════════════════════════════ */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--navy); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-border); border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ VIDEO BACKGROUND ══════════════════════════════════════ -->
+    <div class="bg-video-wrap">
+        <video autoplay muted loop playsinline id="bgVideo">
+            <source src="/videos/campus-admin.mp4" type="video/mp4">
+        </video>
+        <div class="bg-overlay"></div>
+    </div>
+    <div class="bg-grain"></div>
+
+    <!-- ═══ TOPBAR ═══════════════════════════════════════════════ -->
+    <header class="topbar">
+        <div class="logo">
+            <div class="logo-emblem">SC</div>
+            <div class="logo-text">Smart<span>Campus</span></div>
+        </div>
+        <div class="topbar-nav">
+            <a class="nav-link" href="/dashboard/student">Dashboard</a>
+            <a class="nav-link" href="/dashboard/student#complaints">Complaints</a>
+            <a class="nav-link" href="/dashboard/student#events">Events</a>
+            <a class="nav-link active">FYP</a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- ═══ MAIN CONTENT ═════════════════════════════════════════ -->
+    <main class="main">
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1 class="hero-title">🎓 Final Year Project</h1>
+            <p class="hero-subtitle">Manage your FYP group, submit proposals, track milestones, and collaborate with your supervisor</p>
+            <div class="project-status" id="fypStatusDisplay">
+                ⏳ Loading project status...
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card" onclick="scrollToSection('create')">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="groupStatus">-</div>
+                <div class="stat-label">Group Status</div>
+            </div>
+            <div class="stat-card" onclick="scrollToSection('milestones')">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-value" id="milestoneCount">0/0</div>
+                <div class="stat-label">Milestones</div>
+            </div>
+            <div class="stat-card" onclick="scrollToSection('documents')">
+                <div class="stat-icon">📄</div>
+                <div class="stat-value" id="documentCount">0</div>
+                <div class="stat-label">Documents</div>
+            </div>
+            <div class="stat-card" onclick="scrollToSection('supervisor')">
+                <div class="stat-icon">👨‍🏫</div>
+                <div class="stat-value" id="supervisorStatus">-</div>
+                <div class="stat-label">Supervisor</div>
+            </div>
+        </div>
+
+        <!-- Tabs Container -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('create')">📝 Create / Edit FYP</button>
+                <button class="tab" onclick="switchTab('milestones')">🎯 Milestones</button>
+                <button class="tab" onclick="switchTab('documents')">📄 Documents</button>
+                <button class="tab" onclick="switchTab('supervisor')">👨‍🏫 Supervisor</button>
+            </div>
+
+            <!-- Create FYP Tab -->
+            <div id="createTab" class="tab-content active">
+                <div class="form-card">
+                    <div class="form-title">📝 Create or Update FYP Group</div>
+                    <form id="fypForm">
+                        <div class="form-group">
+                            <label class="form-label">Group Name *</label>
+                            <input type="text" id="groupName" class="form-input" required placeholder="e.g., AI Innovators 2024">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Project Title *</label>
+                            <input type="text" id="projectTitle" class="form-input" required placeholder="Enter your project title">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Domain / Area *</label>
+                            <select id="domain" class="form-select" required>
+                                <option value="">Select Domain</option>
+                                <option>Artificial Intelligence</option>
+                                <option>Web Development</option>
+                                <option>Mobile Development</option>
+                                <option>Data Science</option>
+                                <option>Cloud Computing</option>
+                                <option>Cybersecurity</option>
+                                <option>IoT</option>
+                                <option>Blockchain</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Project Description *</label>
+                            <textarea id="projectDescription" class="form-textarea" rows="5" required placeholder="Describe your project in detail..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Team Members (Email addresses)</label>
+                            <input type="text" id="members" class="form-input" placeholder="member1@university.edu, member2@university.edu">
+                            <small style="color: var(--text-faint); font-size: 0.7rem;">You are automatically added as the group leader</small>
+                        </div>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button type="submit" class="btn btn-primary">🚀 Submit FYP Proposal</button>
+                            <button type="button" class="btn btn-outline" onclick="loadExistingFYP()">📂 Load Existing FYP</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Milestones Tab -->
+            <div id="milestonesTab" class="tab-content">
+                <div class="form-card">
+                    <div class="form-title">🎯 Project Milestones</div>
+                    <button class="btn btn-primary" onclick="showAddMilestoneModal()" style="margin-bottom: 1rem;">+ Add Milestone</button>
+                    <div id="milestonesList">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents Tab -->
+            <div id="documentsTab" class="tab-content">
+                <div class="form-card">
+                    <div class="form-title">📄 Project Documents</div>
+                    <div class="file-upload-area" onclick="document.getElementById('documentUpload').click()">
+                        <div class="file-upload-icon">📁</div>
+                        <div class="file-upload-text">Click to upload document</div>
+                        <small style="color: var(--text-faint);">Supported: PDF, DOC, DOCX, PPT, ZIP (Max 10MB)</small>
+                    </div>
+                    <input type="file" id="documentUpload" style="display: none;" multiple>
+                    <div id="documentsList" style="margin-top: 1.5rem;">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Supervisor Tab -->
+            <div id="supervisorTab" class="tab-content">
+                <div class="form-card">
+                    <div class="form-title">👨‍🏫 Supervisor Information</div>
+                    <div id="supervisorInfo">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Milestone Modal -->
+    <div id="milestoneModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Add New Milestone</h2>
+            <form id="milestoneForm">
+                <div class="form-group">
+                    <label class="form-label">Milestone Title</label>
+                    <input type="text" id="milestoneTitle" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="milestoneDescription" class="form-textarea" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Due Date</label>
+                    <input type="date" id="milestoneDueDate" class="form-input" required>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="closeMilestoneModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Milestone</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentFypId = null;
+
+        // Handle video background
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('bgVideo');
+            if (video) {
+                video.play().catch(() => {});
+            }
+            loadExistingFYP();
+        });
+
+        async function loadExistingFYP() {
+            try {
+                const response = await fetch('/fyp/my-fyp');
+                const data = await response.json();
+                
+                if (data.success && data.fyp) {
+                    currentFypId = data.fyp._id;
+                    populateFYPForm(data.fyp);
+                    updateStats(data.fyp);
+                    loadMilestones(data.fyp);
+                    loadDocuments(data.fyp);
+                    loadSupervisorInfo(data.fyp);
+                } else {
+                    showNoFYPState();
+                }
+            } catch (error) {
+                console.error('Error loading FYP:', error);
+                showNoFYPState();
+            }
+        }
+
+        function populateFYPForm(fyp) {
+            document.getElementById('groupName').value = fyp.groupName || '';
+            document.getElementById('projectTitle').value = fyp.projectTitle || '';
+            document.getElementById('domain').value = fyp.domain || '';
+            document.getElementById('projectDescription').value = fyp.projectDescription || '';
+            
+            if (fyp.members) {
+                const memberEmails = fyp.members.filter(m => m.role !== 'Leader').map(m => m.studentName).join(', ');
+                document.getElementById('members').value = memberEmails;
+            }
+            
+            updateStatusDisplay(fyp.status);
+        }
+
+        function updateStats(fyp) {
+            const groupStatusEl = document.getElementById('groupStatus');
+            groupStatusEl.innerHTML = fyp.groupName ? '✅ Active' : '❌ Not Created';
+            groupStatusEl.style.color = fyp.groupName ? 'var(--success)' : 'var(--danger)';
+            
+            const completed = fyp.milestones ? fyp.milestones.filter(m => m.status === 'Completed').length : 0;
+            const total = fyp.milestones ? fyp.milestones.length : 0;
+            document.getElementById('milestoneCount').innerHTML = `${completed}/${total}`;
+            
+            document.getElementById('documentCount').innerHTML = fyp.documents ? fyp.documents.length : '0';
+            
+            const supervisorStatus = document.getElementById('supervisorStatus');
+            const hasSupervisor = fyp.supervisor && fyp.supervisor.name;
+            supervisorStatus.innerHTML = hasSupervisor ? '✅ Assigned' : '⏳ Pending';
+            supervisorStatus.style.color = hasSupervisor ? 'var(--success)' : 'var(--warning)';
+        }
+
+        function updateStatusDisplay(status) {
+            const statusMap = {
+                'Pending': '⏳ Pending Approval',
+                'Approved': '✅ Approved',
+                'Rejected': '❌ Rejected',
+                'In Progress': '🚀 In Progress',
+                'Completed': '🏆 Completed'
+            };
+            document.getElementById('fypStatusDisplay').innerHTML = `📊 ${statusMap[status] || 'Not Submitted'}`;
+        }
+
+        function showNoFYPState() {
+            document.getElementById('groupStatus').innerHTML = '❌ Not Created';
+            document.getElementById('milestoneCount').innerHTML = '0/0';
+            document.getElementById('documentCount').innerHTML = '0';
+            document.getElementById('supervisorStatus').innerHTML = '⏳ N/A';
+            document.getElementById('fypStatusDisplay').innerHTML = '📊 Project Status: Not Submitted Yet';
+        }
+
+        // FYP Form Submission
+        document.getElementById('fypForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const members = document.getElementById('members').value.split(',').map(m => m.trim()).filter(m => m);
+            
+            const formData = {
+                groupName: document.getElementById('groupName').value,
+                projectTitle: document.getElementById('projectTitle').value,
+                projectDescription: document.getElementById('projectDescription').value,
+                domain: document.getElementById('domain').value,
+                members: members
+            };
+            
+            try {
+                const response = await fetch('/fyp/create-group', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showToast('FYP submitted successfully! Waiting for admin approval.', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showToast('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error submitting FYP: ' + error.message, 'error');
+            }
+        });
+
+        // Load Milestones
+        async function loadMilestones(fyp) {
+            const container = document.getElementById('milestonesList');
+            if (!fyp.milestones || fyp.milestones.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted);">No milestones added yet. Click "Add Milestone" to create one.</div>';
+                return;
+            }
+            
+            container.innerHTML = fyp.milestones.map(milestone => `
+                <div class="milestone-item">
+                    <div class="milestone-header">
+                        <span class="milestone-title">${escapeHtml(milestone.title)}</span>
+                        <select onchange="updateMilestoneStatus('${milestone._id}', this.value)" class="badge ${milestone.status === 'Completed' ? 'badge-completed' : 'badge-pending'}" style="background: transparent;">
+                            <option value="Pending" ${milestone.status === 'Pending' ? 'selected' : ''}>⏳ Pending</option>
+                            <option value="Completed" ${milestone.status === 'Completed' ? 'selected' : ''}>✅ Completed</option>
+                        </select>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0.5rem 0;">${escapeHtml(milestone.description)}</p>
+                    <div style="display: flex; gap: 1rem; font-size: 0.7rem; color: var(--text-faint);">
+                        <span>📅 Due: ${new Date(milestone.dueDate).toLocaleDateString()}</span>
+                        ${milestone.completedAt ? `<span>✅ Completed: ${new Date(milestone.completedAt).toLocaleDateString()}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update Milestone Status
+        async function updateMilestoneStatus(milestoneId, status) {
+            if (!currentFypId) return;
+            
+            try {
+                const response = await fetch(`/fyp/${currentFypId}/milestones/${milestoneId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Milestone status updated!', 'success');
+                    loadExistingFYP();
+                }
+            } catch (error) {
+                showToast('Error updating milestone', 'error');
+            }
+        }
+
+        // Add Milestone
+        document.getElementById('milestoneForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentFypId) {
+                showToast('Please create your FYP group first before adding milestones.', 'error');
+                closeMilestoneModal();
+                return;
+            }
+            
+            const milestoneData = {
+                title: document.getElementById('milestoneTitle').value,
+                description: document.getElementById('milestoneDescription').value,
+                dueDate: document.getElementById('milestoneDueDate').value,
+                status: 'Pending'
+            };
+            
+            try {
+                const response = await fetch(`/fyp/${currentFypId}/milestones`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(milestoneData)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Milestone added successfully!', 'success');
+                    closeMilestoneModal();
+                    loadExistingFYP();
+                } else {
+                    showToast('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error adding milestone', 'error');
+            }
+        });
+
+        // Load Documents
+        function loadDocuments(fyp) {
+            const container = document.getElementById('documentsList');
+            if (!fyp.documents || fyp.documents.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted);">No documents uploaded yet. Click the upload area to add files.</div>';
+                return;
+            }
+            
+            container.innerHTML = fyp.documents.map(doc => `
+                <div class="member-tag" style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 0.5rem;">
+                    <span>📄 ${escapeHtml(doc.name)}</span>
+                    <small>${new Date(doc.uploadedAt).toLocaleDateString()}</small>
+                </div>
+            `).join('');
+        }
+
+        // Load Supervisor Info
+        function loadSupervisorInfo(fyp) {
+            const container = document.getElementById('supervisorInfo');
+            if (!fyp.supervisor || !fyp.supervisor.name) {
+                container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted);">No supervisor assigned yet. Admin will assign a supervisor after proposal approval.</div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 1.2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="width: 50px; height: 50px; background: var(--gold-pale); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">👨‍🏫</div>
+                        <div>
+                            <h3 style="color: var(--white);">${escapeHtml(fyp.supervisor.name)}</h3>
+                            <p style="color: var(--gold); font-size: 0.8rem;">Project Supervisor</p>
+                        </div>
+                    </div>
+                    <div style="border-top: 1px solid var(--card-border); padding-top: 1rem;">
+                        <p><strong>📧 Email:</strong> ${fyp.supervisor.email || 'Not provided'}</p>
+                        <p><strong>🏛️ Department:</strong> ${fyp.supervisor.department || 'Not specified'}</p>
+                        ${fyp.adminFeedback ? `<p style="margin-top: 1rem; background: var(--info-bg); padding: 0.8rem; border-radius: 8px;"><strong>💬 Admin Feedback:</strong><br>${escapeHtml(fyp.adminFeedback)}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Document Upload
+        document.getElementById('documentUpload').addEventListener('change', async (e) => {
+            if (!currentFypId) {
+                showToast('Please create your FYP group first before uploading documents.', 'error');
+                return;
+            }
+            
+            const files = e.target.files;
+            showToast(`Selected ${files.length} file(s). In production, this would upload to server.`, 'info');
+            // In production, implement actual file upload
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tabName === 'create') {
+                document.querySelector('.tabs button:first-child').classList.add('active');
+                document.getElementById('createTab').classList.add('active');
+            } else if (tabName === 'milestones') {
+                document.querySelector('.tabs button:nth-child(2)').classList.add('active');
+                document.getElementById('milestonesTab').classList.add('active');
+            } else if (tabName === 'documents') {
+                document.querySelector('.tabs button:nth-child(3)').classList.add('active');
+                document.getElementById('documentsTab').classList.add('active');
+            } else if (tabName === 'supervisor') {
+                document.querySelector('.tabs button:nth-child(4)').classList.add('active');
+                document.getElementById('supervisorTab').classList.add('active');
+            }
+        }
+
+        function scrollToSection(section) {
+            switchTab(section);
+        }
+
+        function showAddMilestoneModal() {
+            if (!currentFypId) {
+                showToast('Please create your FYP group first before adding milestones.', 'error');
+                return;
+            }
+            document.getElementById('milestoneModal').style.display = 'flex';
+        }
+
+        function closeMilestoneModal() {
+            document.getElementById('milestoneModal').style.display = 'none';
+            document.getElementById('milestoneForm').reset();
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'success' ? '#2ecc82' : type === 'error' ? '#e05c5c' : '#f0a845';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function logout() { 
+            window.location.href = '/logout'; 
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('milestoneModal')) {
+                closeMilestoneModal();
+            }
+        }
+    </script>
+</body>
+</html>

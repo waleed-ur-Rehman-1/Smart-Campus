@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | City University Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --navy:         #080e1c;
+            --navy-2:       #0c1525;
+            --navy-3:       #101d33;
+            --navy-4:       #162440;
+            --gold:         #c9a84c;
+            --gold-light:   #e8c97a;
+            --gold-pale:    rgba(201,168,76,0.12);
+            --gold-border:  rgba(201,168,76,0.22);
+            --white:        #ffffff;
+            --text:         rgba(255,255,255,0.82);
+            --text-muted:   rgba(255,255,255,0.42);
+            --text-faint:   rgba(255,255,255,0.18);
+            --success:      #2ecc82;
+            --success-bg:   rgba(46,204,130,0.12);
+            --danger:       #e05c5c;
+            --danger-bg:    rgba(224,92,92,0.12);
+            --warning:      #f0a845;
+            --warning-bg:   rgba(240,168,69,0.12);
+            --info:         #5b9cf6;
+            --info-bg:      rgba(91,156,246,0.12);
+            --glass:        rgba(255,255,255,0.04);
+            --glass-hover:  rgba(255,255,255,0.07);
+            --card-border:  rgba(255,255,255,0.07);
+            --sidebar-w:    260px;
+            --topbar-h:     70px;
+        }
+
+        html { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--navy); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-border); border-radius: 3px; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--navy);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ═══ VIDEO BACKGROUND ═══════════════════════════ */
+        .bg-video-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-video-wrap video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.07;
+            filter: saturate(0.4) brightness(0.6);
+        }
+
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 55%),
+                radial-gradient(ellipse 60% 80% at 80% 80%, rgba(11,28,58,0.9) 0%, transparent 60%),
+                linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 50%, var(--navy) 100%);
+        }
+
+        .bg-grain {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px;
+            pointer-events: none;
+        }
+
+        /* ═══ LAYOUT SHELL ═══════════════════════════════ */
+        .shell {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ═══ SIDEBAR ════════════════════════════════════ */
+        .sidebar {
+            width: var(--sidebar-w);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            background: rgba(8, 14, 28, 0.88);
+            border-right: 1px solid var(--gold-border);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 3px; }
+
+        .sidebar-logo {
+            padding: 1.8rem 1.5rem 1.4rem;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+
+        .logo-emblem {
+            width: 40px; height: 40px;
+            border: 1.5px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .logo-emblem::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border: 1px solid rgba(201,168,76,0.25);
+            border-radius: 50%;
+        }
+
+        .logo-text strong {
+            display: block;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--white);
+            line-height: 1;
+        }
+
+        .logo-text small {
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-top: 3px;
+            display: block;
+        }
+
+        .sidebar-admin {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--navy);
+            flex-shrink: 0;
+        }
+
+        .admin-info strong {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .admin-info span {
+            font-size: 0.68rem;
+            color: var(--gold);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .admin-status {
+            margin-left: auto;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            flex-shrink: 0;
+            animation: blink 3s ease infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.2rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-section-label {
+            font-size: 0.62rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+            padding: 0.6rem 1.5rem 0.4rem;
+            margin-top: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.72rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            font-weight: 400;
+            border-left: 2px solid transparent;
+            margin: 1px 0;
+        }
+
+        .nav-item:hover {
+            background: var(--glass);
+            color: var(--white);
+            border-left-color: rgba(201,168,76,0.4);
+        }
+
+        .nav-item.active {
+            background: var(--gold-pale);
+            color: var(--gold-light);
+            border-left-color: var(--gold);
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .nav-badge.gold {
+            background: var(--gold);
+            color: var(--navy);
+        }
+
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .logout-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 1rem;
+            background: rgba(224,92,92,0.08);
+            border: 1px solid rgba(224,92,92,0.2);
+            border-radius: 8px;
+            color: var(--danger);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .logout-btn:hover {
+            background: rgba(224,92,92,0.15);
+            border-color: rgba(224,92,92,0.4);
+        }
+
+        /* ═══ TOPBAR ══════════════════════════════════════ */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: var(--topbar-h);
+            z-index: 100;
+            background: rgba(8, 14, 28, 0.82);
+            border-bottom: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            gap: 1.5rem;
+        }
+
+        .topbar-title {
+            flex: 1;
+        }
+
+        .topbar-title h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            font-weight: 500;
+            color: var(--white);
+            line-height: 1;
+        }
+
+        .topbar-title p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .topbar-time {
+            text-align: right;
+        }
+
+        .topbar-time .time {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--gold-light);
+            line-height: 1;
+        }
+
+        .topbar-time .date {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+        }
+
+        .topbar-divider {
+            width: 1px;
+            height: 32px;
+            background: var(--card-border);
+        }
+
+        .notif-btn {
+            position: relative;
+            width: 38px; height: 38px;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            background: var(--glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            color: var(--text-muted);
+        }
+
+        .notif-btn:hover {
+            background: var(--glass-hover);
+            border-color: var(--gold-border);
+            color: var(--white);
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: 7px; right: 7px;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--danger);
+            border: 1.5px solid var(--navy-2);
+        }
+
+        /* ═══ MAIN CONTENT ═══════════════════════════════ */
+        .main {
+            margin-left: var(--sidebar-w);
+            margin-top: var(--topbar-h);
+            padding: 2rem;
+            min-height: calc(100vh - var(--topbar-h));
+        }
+
+        /* ═══ STATS ROW ══════════════════════════════════ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.3rem 1.2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--card-accent, var(--gold));
+            opacity: 0.7;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: -20px; right: -20px;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: var(--card-accent, var(--gold));
+            opacity: 0.04;
+            transition: transform 0.4s;
+        }
+
+        .stat-card:hover {
+            background: var(--glass-hover);
+            border-color: var(--card-accent, var(--gold-border));
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+        }
+
+        .stat-card:hover::after { transform: scale(1.5); }
+
+        .stat-icon {
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        .stat-val {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--white);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-lbl {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+        }
+
+        .stat-trend {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .trend-up   { background: var(--success-bg); color: var(--success); }
+        .trend-down { background: var(--danger-bg);  color: var(--danger); }
+        .trend-warn { background: var(--warning-bg); color: var(--warning); }
+
+        /* accent colours per card */
+        .c-gold   { --card-accent: var(--gold); }
+        .c-danger { --card-accent: var(--danger); }
+        .c-success{ --card-accent: var(--success); }
+        .c-info   { --card-accent: var(--info); }
+        .c-warn   { --card-accent: var(--warning); }
+        .c-purple { --card-accent: #a78bfa; }
+
+        /* ═══ GRID SECTIONS ══════════════════════════════ */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .full-width { grid-column: 1 / -1; }
+
+        /* ═══ PANEL ══════════════════════════════════════ */
+        .panel {
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .panel:hover {
+            border-color: var(--gold-border);
+            box-shadow: 0 0 40px rgba(201,168,76,0.06);
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .panel-head-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .panel-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            background: var(--gold-pale);
+            border: 1px solid var(--gold-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .panel-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .panel-subtitle {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .panel-action {
+            font-size: 0.75rem;
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            transition: color 0.3s;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .panel-action:hover { color: var(--gold-light); }
+
+        .panel-body { padding: 1.2rem 1.5rem; }
+
+        /* ═══ TABLE ══════════════════════════════════════ */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+            padding: 0 0.75rem 0.9rem;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .data-table td {
+            padding: 0.9rem 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            vertical-align: middle;
+        }
+
+        .data-table tr:last-child td { border-bottom: none; }
+
+        .data-table tr {
+            transition: background 0.25s;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255,255,255,0.025);
+        }
+
+        .data-table .name-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .mini-avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy-4), var(--navy-3));
+            border: 1px solid var(--gold-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            flex-shrink: 0;
+        }
+
+        /* ═══ BADGES ══════════════════════════════════════ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+        }
+
+        .badge::before {
+            content: '';
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .badge-pending  { background: var(--warning-bg); color: var(--warning); }
+        .badge-resolved { background: var(--success-bg); color: var(--success); }
+        .badge-rejected { background: var(--danger-bg);  color: var(--danger); }
+        .badge-inprog   { background: var(--info-bg);    color: var(--info); }
+        .badge-gold     { background: var(--gold-pale);  color: var(--gold-light); }
+
+        /* ═══ ACTION BUTTONS ═════════════════════════════ */
+        .act-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.28s;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .act-view {
+            background: var(--gold-pale);
+            border-color: var(--gold-border);
+            color: var(--gold-light);
+        }
+
+        .act-view:hover {
+            background: rgba(201,168,76,0.2);
+            border-color: var(--gold);
+        }
+
+        .act-approve {
+            background: var(--success-bg);
+            border-color: rgba(46,204,130,0.25);
+            color: var(--success);
+        }
+
+        .act-approve:hover { background: rgba(46,204,130,0.2); }
+
+        .act-reject {
+            background: var(--danger-bg);
+            border-color: rgba(224,92,92,0.25);
+            color: var(--danger);
+        }
+
+        .act-reject:hover { background: rgba(224,92,92,0.2); }
+
+        /* ═══ ANNOUNCEMENT CARDS ═════════════════════════ */
+        .ann-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+        .ann-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 9px;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s;
+        }
+
+        .ann-item:hover {
+            background: var(--glass-hover);
+            border-color: var(--gold-border);
+        }
+
+        .ann-date-block {
+            flex-shrink: 0;
+            width: 42px;
+            text-align: center;
+            padding-top: 2px;
+        }
+
+        .ann-day {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gold);
+            line-height: 1;
+        }
+
+        .ann-month {
+            font-size: 0.62rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .ann-divider {
+            width: 1px;
+            background: var(--card-border);
+            flex-shrink: 0;
+        }
+
+        .ann-content strong {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--white);
+            margin-bottom: 0.3rem;
+        }
+
+        .ann-content p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        /* ═══ EVENTS TABLE ═══════════════════════════════ */
+        .seat-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .seat-track {
+            flex: 1;
+            height: 4px;
+            background: var(--card-border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .seat-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .seat-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* ═══ QUICK ACTIONS ══════════════════════════════ */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+        }
+
+        .qa-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 1.2rem 0.8rem;
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .qa-btn:hover {
+            background: var(--gold-pale);
+            border-color: var(--gold-border);
+            color: var(--gold-light);
+            transform: translateY(-3px);
+        }
+
+        .qa-icon { font-size: 1.5rem; }
+        .qa-label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.05em; text-align: center; }
+
+        /* ═══ ACTIVITY FEED ══════════════════════════════ */
+        .activity-feed { display: flex; flex-direction: column; }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.9rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            align-items: flex-start;
+        }
+
+        .activity-item:last-child { border-bottom: none; }
+
+        .act-dot-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 4px;
+        }
+
+        .act-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .act-line {
+            width: 1px;
+            flex: 1;
+            background: var(--card-border);
+            margin-top: 4px;
+            min-height: 20px;
+        }
+
+        .activity-item:last-child .act-line { display: none; }
+
+        .act-body {
+            flex: 1;
+        }
+
+        .act-msg {
+            font-size: 0.84rem;
+            color: var(--text);
+            line-height: 1.45;
+        }
+
+        .act-msg strong { color: var(--white); }
+
+        .act-time {
+            font-size: 0.7rem;
+            color: var(--text-faint);
+            margin-top: 3px;
+        }
+
+        /* ═══ ANIMATIONS ═════════════════════════════════ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.in { opacity: 1; transform: none; }
+
+        [data-d="1"] { transition-delay: 0.05s; }
+        [data-d="2"] { transition-delay: 0.12s; }
+        [data-d="3"] { transition-delay: 0.19s; }
+        [data-d="4"] { transition-delay: 0.26s; }
+        [data-d="5"] { transition-delay: 0.33s; }
+        [data-d="6"] { transition-delay: 0.40s; }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            z-index: 3000;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ═══ RESPONSIVE ═════════════════════════════════ */
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 900px) {
+            :root { --sidebar-w: 0px; }
+            .sidebar { transform: translateX(-260px); }
+            .sidebar.open { transform: translateX(0); --sidebar-w: 260px; }
+            .topbar { left: 0; }
+            .main { margin-left: 0; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .quick-actions { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 580px) {
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .main { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ VIDEO BG ══════════════════════════════════════ -->
+    <div class="bg-video-wrap">
+        <video autoplay muted loop playsinline preload="auto"
+               src="/videos/campus-admin.mp4"
+               poster="/images/campus-admin-poster.jpg">
+        </video>
+        <div class="bg-overlay"></div>
+    </div>
+    <div class="bg-grain"></div>
+
+    <div class="shell">
+
+        <!-- ═══ SIDEBAR ═══════════════════════════════════ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-emblem">SC</div>
+                <div class="logo-text">
+                    <strong>SmartCampus</strong>
+                    <small>Control Panel</small>
+                </div>
+            </div>
+
+            <div class="sidebar-admin">
+                <div class="avatar">AD</div>
+                <div class="admin-info">
+                    <strong>Administrator</strong>
+                    <span>Super Admin</span>
+                </div>
+                <div class="admin-status"></div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Overview</div>
+                <div class="nav-item active" onclick="window.location.href='/dashboard/admin'">
+                    <span class="nav-icon">⬛</span> Dashboard
+                </div>
+                <div class="nav-item" onclick="window.location.href='/admin/analytics'">
+                    <span class="nav-icon">📊</span> Analytics
+                </div>
+
+                <div class="nav-section-label">Management</div>
+                <div class="nav-item" onclick="window.location.href='/admin/students'">
+                    <span class="nav-icon">👥</span> Students
+                    <span class="nav-badge gold"><%= typeof totalStudents !== 'undefined' ? totalStudents : '0' %></span>
+                </div>
+                
+                <!-- MANAGEMENT LINKS - ADDED HERE -->
+                <div class="nav-section-label" style="margin-top: 0.25rem;">Content Manager</div>
+                
+                <div class="nav-item" onclick="window.location.href='/admin/announcements'">
+                    <span class="nav-icon">📢</span>
+                    <span>Manage Announcements</span>
+                </div>
+                
+                <div class="nav-item" onclick="window.location.href='/admin/events'">
+                    <span class="nav-icon">🎉</span>
+                    <span>Manage Events</span>
+                </div>
+                
+                <div class="nav-item" onclick="window.location.href='/admin/complaints'">
+                    <span class="nav-icon">📋</span>
+                    <span>Manage Complaints</span>
+                    <span class="nav-badge"><%= typeof pendingComplaints !== 'undefined' ? pendingComplaints : '0' %></span>
+                </div>
+                
+                <div class="nav-item" onclick="window.location.href='/admin/fyp'">
+                    <span class="nav-icon">📚</span>
+                    <span>FYP Projects</span>
+                    <span class="nav-badge"><%= typeof pendingFYP !== 'undefined' ? pendingFYP : '0' %></span>
+                </div>
+
+                <div class="nav-section-label">System</div>
+                <div class="nav-item" onclick="window.location.href='/admin/settings'">
+                    <span class="nav-icon">⚙️</span> Settings
+                </div>
+                <div class="nav-item" onclick="window.location.href='/admin/access'">
+                    <span class="nav-icon">🔐</span> Access Control
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="logout()">
+                    <span>⎋</span> Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- ═══ PAGE WRAP ════════════════════════════════ -->
+        <div style="flex:1; display:flex; flex-direction:column;">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-title">
+                    <h1>Administrator Dashboard</h1>
+                    <p>City University of Science &amp; Information Technology</p>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-time">
+                        <div class="time" id="live-time">--:--</div>
+                        <div class="date" id="live-date">---</div>
+                    </div>
+
+                    <div class="topbar-divider"></div>
+
+                    <div class="notif-btn" title="Notifications" onclick="showNotifications()">
+                        🔔
+                        <span class="notif-dot"></span>
+                    </div>
+
+                    <div class="notif-btn" title="Messages" onclick="showMessages()">✉️</div>
+                </div>
+            </header>
+
+            <!-- MAIN -->
+            <main class="main">
+
+                <!-- ── STAT CARDS ──────────────────────────── -->
+                <div class="stats-row">
+                    <div class="stat-card c-gold reveal" data-d="1" onclick="window.location.href='/admin/students'">
+                        <span class="stat-icon">👥</span>
+                        <div class="stat-val" data-count="<%= typeof totalStudents !== 'undefined' ? totalStudents : 0 %>">0</div>
+                        <div class="stat-lbl">Total Students</div>
+                        <span class="stat-trend trend-up">+8%</span>
+                    </div>
+                    <div class="stat-card c-danger reveal" data-d="2" onclick="window.location.href='/admin/complaints?status=Pending'">
+                        <span class="stat-icon">📋</span>
+                        <div class="stat-val" data-count="<%= typeof pendingComplaints !== 'undefined' ? pendingComplaints : 0 %>">0</div>
+                        <div class="stat-lbl">Pending Complaints</div>
+                        <span class="stat-trend trend-warn">Active</span>
+                    </div>
+                    <div class="stat-card c-success reveal" data-d="3" onclick="window.location.href='/admin/events'">
+                        <span class="stat-icon">🎉</span>
+                        <div class="stat-val" data-count="<%= typeof activeEvents !== 'undefined' ? activeEvents : 0 %>">0</div>
+                        <div class="stat-lbl">Active Events</div>
+                        <span class="stat-trend trend-up">Live</span>
+                    </div>
+                    <div class="stat-card c-warn reveal" data-d="4" onclick="window.location.href='/admin/fyp?status=Pending'">
+                        <span class="stat-icon">📚</span>
+                        <div class="stat-val" data-count="<%= typeof pendingFYP !== 'undefined' ? pendingFYP : 0 %>">0</div>
+                        <div class="stat-lbl">FYP Pending</div>
+                        <span class="stat-trend trend-warn">Review</span>
+                    </div>
+                    <div class="stat-card c-info reveal" data-d="5" onclick="window.location.href='/admin/complaints'">
+                        <span class="stat-icon">🗂️</span>
+                        <div class="stat-val" data-count="<%= typeof totalComplaints !== 'undefined' ? totalComplaints : 0 %>">0</div>
+                        <div class="stat-lbl">Total Complaints</div>
+                        <span class="stat-trend trend-up">All time</span>
+                    </div>
+                    <div class="stat-card c-purple reveal" data-d="6" onclick="window.location.href='/admin/events'">
+                        <span class="stat-icon">📅</span>
+                        <div class="stat-val" data-count="<%= typeof totalEvents !== 'undefined' ? totalEvents : 0 %>">0</div>
+                        <div class="stat-lbl">Total Events</div>
+                        <span class="stat-trend trend-up">+3</span>
+                    </div>
+                </div>
+
+                <!-- ── QUICK ACTIONS ──────────────────────── -->
+                <div class="panel reveal" style="margin-bottom:1.5rem;">
+                    <div class="panel-head">
+                        <div class="panel-head-left">
+                            <div class="panel-icon">⚡</div>
+                            <div>
+                                <div class="panel-title">Quick Actions</div>
+                                <div class="panel-subtitle">Frequently used operations</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="quick-actions">
+                            <div class="qa-btn" onclick="window.location.href='/admin/announcements'">
+                                <span class="qa-icon">➕</span>
+                                <span class="qa-label">New Announcement</span>
+                            </div>
+                            <div class="qa-btn" onclick="window.location.href='/admin/events'">
+                                <span class="qa-icon">🎫</span>
+                                <span class="qa-label">Create Event</span>
+                            </div>
+                            <div class="qa-btn" onclick="window.location.href='/admin/complaints'">
+                                <span class="qa-icon">📥</span>
+                                <span class="qa-label">View Complaints</span>
+                            </div>
+                            <div class="qa-btn" onclick="exportReport()">
+                                <span class="qa-icon">📤</span>
+                                <span class="qa-label">Export Report</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── COMPLAINTS + ACTIVITY ──────────────── -->
+                <div class="content-grid">
+
+                    <!-- Complaints Table -->
+                    <div class="panel reveal">
+                        <div class="panel-head">
+                            <div class="panel-head-left">
+                                <div class="panel-icon">📋</div>
+                                <div>
+                                    <div class="panel-title">Recent Complaints</div>
+                                    <div class="panel-subtitle">Awaiting your review</div>
+                                </div>
+                            </div>
+                            <button class="panel-action" onclick="window.location.href='/admin/complaints'">View All →</button>
+                        </div>
+                        <div class="panel-body" style="padding:0;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Issue</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentComplaintsTable">
+                                    <tr><td colspan="5" style="text-align:center;">Loading complaints...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Activity Feed -->
+                    <div class="panel reveal">
+                        <div class="panel-head">
+                            <div class="panel-head-left">
+                                <div class="panel-icon">⚡</div>
+                                <div>
+                                    <div class="panel-title">Live Activity</div>
+                                    <div class="panel-subtitle">Real-time campus events</div>
+                                </div>
+                            </div>
+                            <button class="panel-action" onclick="clearActivities()">Clear</button>
+                        </div>
+                        <div class="panel-body">
+                            <div class="activity-feed" id="activityFeed">
+                                <div class="activity-item">
+                                    <div class="act-dot-wrap">
+                                        <div class="act-dot" style="background:var(--success);box-shadow:0 0 6px var(--success);"></div>
+                                        <div class="act-line"></div>
+                                    </div>
+                                    <div class="act-body">
+                                        <div class="act-msg"><strong>System Ready</strong> — Admin dashboard loaded</div>
+                                        <div class="act-time">Just now</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ── EVENTS + ANNOUNCEMENTS ─────────────── -->
+                <div class="content-grid">
+
+                    <!-- Events Table -->
+                    <div class="panel reveal">
+                        <div class="panel-head">
+                            <div class="panel-head-left">
+                                <div class="panel-icon">🎉</div>
+                                <div>
+                                    <div class="panel-title">Upcoming Events</div>
+                                    <div class="panel-subtitle">Seat occupancy at a glance</div>
+                                </div>
+                            </div>
+                            <button class="panel-action" onclick="window.location.href='/admin/events'">Manage →</button>
+                        </div>
+                        <div class="panel-body" style="padding:0;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Date</th>
+                                        <th>Venue</th>
+                                        <th>Seats</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="upcomingEventsTable">
+                                    <tr><td colspan="4" style="text-align:center;">Loading events...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Announcements -->
+                    <div class="panel reveal">
+                        <div class="panel-head">
+                            <div class="panel-head-left">
+                                <div class="panel-icon">📢</div>
+                                <div>
+                                    <div class="panel-title">Recent Announcements</div>
+                                    <div class="panel-subtitle">Posted to all students</div>
+                                </div>
+                            </div>
+                            <button class="panel-action" onclick="window.location.href='/admin/announcements'">New +</button>
+                        </div>
+                        <div class="panel-body">
+                            <div class="ann-list" id="announcementsList">
+                                <div style="text-align:center; padding:1rem;">Loading announcements...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ── FOOTER BAR ──────────────────────────── -->
+                <div style="text-align:center; padding:1.5rem 0 0.5rem; border-top:1px solid var(--card-border); margin-top:0.5rem;">
+                    <p style="font-size:0.72rem; color:var(--text-faint); letter-spacing:0.06em;">
+                        SmartCampus Admin Panel · City University of Science &amp; Information Technology · Peshawar, KPK
+                    </p>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // ── Live clock ────────────────────────────────
+        function updateClock() {
+            const now = new Date();
+            const t = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const d = now.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('live-time').textContent = t;
+            document.getElementById('live-date').textContent = d;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // ── Scroll reveal ─────────────────────────────
+        const revealEls = document.querySelectorAll('.reveal');
+        const ro = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }
+            });
+        }, { threshold: 0.08 });
+        revealEls.forEach(el => ro.observe(el));
+
+        // ── Counter animation ─────────────────────────
+        function runCount(el, target, dur = 1600) {
+            let start = null;
+            const step = ts => {
+                if (!start) start = ts;
+                const p = Math.min((ts - start) / dur, 1);
+                const eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = Math.floor(eased * target).toLocaleString();
+                if (p < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        }
+
+        const countEls = document.querySelectorAll('[data-count]');
+        const co = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    runCount(e.target, parseInt(e.target.dataset.count, 10));
+                    co.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        countEls.forEach(el => co.observe(el));
+
+        // ── Seat bars animate on scroll ───────────────
+        const seatFills = document.querySelectorAll('.seat-fill');
+        const so = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    const w = e.target.style.width;
+                    e.target.style.width = '0';
+                    setTimeout(() => { e.target.style.width = w; }, 100);
+                    so.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        seatFills.forEach(el => so.observe(el));
+
+        // ── Load Data from API ────────────────────────
+        async function loadDashboardData() {
+            try {
+                // Load complaints
+                const complaintsRes = await fetch('/complaints/all');
+                const complaintsData = await complaintsRes.json();
+                if (complaintsData.success) {
+                    displayRecentComplaints(complaintsData.complaints.slice(0, 5));
+                }
+
+                // Load events
+                const eventsRes = await fetch('/events');
+                const eventsData = await eventsRes.json();
+                if (eventsData.success) {
+                    displayUpcomingEvents(eventsData.events.slice(0, 4));
+                }
+
+                // Load announcements
+                const annRes = await fetch('/announcements');
+                const annData = await annRes.json();
+                if (annData.success) {
+                    displayAnnouncements(annData.announcements.slice(0, 3));
+                }
+
+                // Add activity log
+                addActivityLog('Dashboard data loaded successfully', 'success');
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                addActivityLog('Error loading dashboard data', 'danger');
+            }
+        }
+
+        function displayRecentComplaints(complaints) {
+            const tbody = document.getElementById('recentComplaintsTable');
+            if (!complaints || complaints.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No complaints found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = complaints.map(c => `
+                <tr>
+                    <td>
+                        <div class="name-cell">
+                            <div class="mini-avatar">${c.studentName ? c.studentName.charAt(0).toUpperCase() : 'S'}</div>
+                            ${c.studentName || 'Unknown'}
+                        </div>
+                    </td>
+                    <td style="max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(c.title)}</td>
+                    <td><span class="badge badge-gold">${c.category}</span></td>
+                    <td>
+                        <span class="badge ${c.status === 'Pending' ? 'badge-pending' : c.status === 'Resolved' ? 'badge-resolved' : 'badge-inprog'}">
+                            ${c.status}
+                        </span>
+                    </td>
+                    <td><button class="act-btn act-view" onclick="viewComplaint('${c._id}')">View</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function displayUpcomingEvents(events) {
+            const tbody = document.getElementById('upcomingEventsTable');
+            if (!events || events.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No upcoming events</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = events.map(e => {
+                const fillPercent = ((e.totalSeats - e.availableSeats) / e.totalSeats) * 100;
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(e.title)}</strong></td>
+                        <td>${new Date(e.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</td>
+                        <td>${escapeHtml(e.location)}</td>
+                        <td>
+                            <div class="seat-bar">
+                                <div class="seat-track">
+                                    <div class="seat-fill" style="width: ${fillPercent}%"></div>
+                                </div>
+                                <span class="seat-text">${e.availableSeats}/${e.totalSeats}</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function displayAnnouncements(announcements) {
+            const container = document.getElementById('announcementsList');
+            if (!announcements || announcements.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:1rem;">No announcements available</div>';
+                return;
+            }
+
+            container.innerHTML = announcements.map(a => {
+                const d = new Date(a.createdAt);
+                return `
+                    <div class="ann-item">
+                        <div class="ann-date-block">
+                            <div class="ann-day">${d.getDate()}</div>
+                            <div class="ann-month">${d.toLocaleString('default', { month: 'short' })}</div>
+                        </div>
+                        <div class="ann-divider"></div>
+                        <div class="ann-content">
+                            <strong>${escapeHtml(a.title)}</strong>
+                            <p>${escapeHtml(a.content.substring(0, 90))}...</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        let activityLogs = [];
+
+        function addActivityLog(message, type = 'info') {
+            const feed = document.getElementById('activityFeed');
+            const colors = {
+                success: 'var(--success)',
+                danger: 'var(--danger)',
+                warning: 'var(--warning)',
+                info: 'var(--gold)'
+            };
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'activity-item';
+            newItem.innerHTML = `
+                <div class="act-dot-wrap">
+                    <div class="act-dot" style="background: ${colors[type] || colors.info};"></div>
+                    <div class="act-line"></div>
+                </div>
+                <div class="act-body">
+                    <div class="act-msg">${message}</div>
+                    <div class="act-time">Just now</div>
+                </div>
+            `;
+            
+            feed.insertBefore(newItem, feed.firstChild);
+            
+            // Remove old activities (keep last 10)
+            while (feed.children.length > 10) {
+                feed.removeChild(feed.lastChild);
+            }
+        }
+
+        function clearActivities() {
+            const feed = document.getElementById('activityFeed');
+            feed.innerHTML = `
+                <div class="activity-item">
+                    <div class="act-dot-wrap">
+                        <div class="act-dot" style="background:var(--success);"></div>
+                        <div class="act-line"></div>
+                    </div>
+                    <div class="act-body">
+                        <div class="act-msg"><strong>Activity cleared</strong> — Log reset</div>
+                        <div class="act-time">Just now</div>
+                    </div>
+                </div>
+            `;
+            addActivityLog('Activity log cleared', 'warning');
+        }
+
+        function viewComplaint(id) {
+            window.location.href = '/admin/complaints?view=' + id;
+        }
+
+        function showNotifications() {
+            alert('📢 Notifications\n\n- 3 new complaints pending\n- 2 events ending soon\n- 5 students registered today');
+        }
+
+        function showMessages() {
+            alert('✉️ Messages\n\nNo new messages from students.');
+        }
+
+        function exportReport() {
+            window.location.href = '/admin/export-report';
+        }
+
+        function logout() {
+            if (confirm('Sign out of SmartCampus Admin?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'success' ? '#2ecc82' : type === 'error' ? '#e05c5c' : '#f0a845';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+            setInterval(() => {
+                addActivityLog('Auto-refresh: System status OK', 'success');
+            }, 30000);
+        });
+
+        // Stat card hover glow effect
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const r = card.getBoundingClientRect();
+                const x = ((e.clientX - r.left) / r.width) * 100;
+                const y = ((e.clientY - r.top) / r.height) * 100;
+                card.style.setProperty('--mx', x + '%');
+                card.style.setProperty('--my', y + '%');
+            });
+        });
+    </script>
+</body>
+</html>

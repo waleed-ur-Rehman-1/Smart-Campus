@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | City University</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy:       #0a1628;
+            --navy-mid:   #0f2040;
+            --gold:       #c9a84c;
+            --gold-light: #e8c97a;
+            --gold-pale:  #f5e9c8;
+            --cream:      #fdf8f0;
+            --white:      #ffffff;
+            --text-muted: #8a9ab5;
+            --glass:      rgba(255,255,255,0.06);
+            --glass-border: rgba(201,168,76,0.25);
+            --shadow-gold: 0 0 60px rgba(201,168,76,0.15);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--navy);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* ─── SCROLLBAR ─────────────────────────────── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--navy); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+        /* ─── NAVBAR ─────────────────────────────────── */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 1.4rem 0;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 22, 40, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 4px 40px rgba(0,0,0,0.4);
+        }
+
+        .nav-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+        }
+
+        .logo-emblem {
+            width: 42px; height: 42px;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gold);
+            position: relative;
+        }
+
+        .logo-emblem::before {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border: 1px solid rgba(201,168,76,0.35);
+            border-radius: 50%;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+        }
+
+        .logo-text strong {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--white);
+            letter-spacing: 0.03em;
+        }
+
+        .logo-text span {
+            font-size: 0.62rem;
+            font-weight: 400;
+            color: var(--gold);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: rgba(255,255,255,0.75);
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0; right: 0;
+            height: 1px;
+            background: var(--gold);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-links a:hover { color: var(--gold); }
+        .nav-links a:hover::after { transform: scaleX(1); }
+
+        .nav-cta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.65rem 1.6rem;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid rgba(201,168,76,0.5);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(201,168,76,0.1);
+            border-color: var(--gold);
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy);
+        }
+
+        .btn-gold:hover {
+            background: var(--gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(201,168,76,0.35);
+        }
+
+        /* ─── HERO ───────────────────────────────────── */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-video-wrap {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-video-wrap video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0.35;
+        }
+
+        /* Fallback gradient when no video loads */
+        .hero-video-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 120% 80% at 60% 40%, rgba(201,168,76,0.08) 0%, transparent 60%),
+                linear-gradient(160deg, #0a1628 0%, #0d1f3a 40%, #0a1628 100%);
+            z-index: 1;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background:
+                linear-gradient(to bottom, rgba(10,22,40,0.3) 0%, rgba(10,22,40,0.1) 40%, rgba(10,22,40,0.6) 80%, var(--navy) 100%);
+        }
+
+        /* Animated grain texture */
+        .hero-grain {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 180px;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 4;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+            padding-top: 8rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(201,168,76,0.1);
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 100px;
+            padding: 0.4rem 1.1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero-badge-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3rem, 7vw, 6.5rem);
+            font-weight: 300;
+            line-height: 1.05;
+            color: var(--white);
+            max-width: 820px;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.9s 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: var(--gold-light);
+        }
+
+        .hero-sub {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            font-weight: 400;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 1.8rem;
+            letter-spacing: 0.04em;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.9s 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero-desc {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.55);
+            max-width: 520px;
+            line-height: 1.75;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.9s 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.9s 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .btn-large {
+            padding: 0.95rem 2.2rem;
+            font-size: 0.88rem;
+        }
+
+        .hero-stats-strip {
+            position: relative;
+            z-index: 4;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+            margin-top: 5rem;
+            display: flex;
+            gap: 0;
+            border-top: 1px solid rgba(201,168,76,0.15);
+            padding-top: 2.5rem;
+            padding-bottom: 3rem;
+            opacity: 0;
+            animation: fadeUp 0.9s 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero-stat {
+            flex: 1;
+            padding-right: 2.5rem;
+            border-right: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .hero-stat:last-child {
+            padding-right: 0;
+            padding-left: 2.5rem;
+            border-right: none;
+        }
+
+        .hero-stat:not(:first-child) { padding-left: 2.5rem; }
+
+        .stat-num {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: var(--gold);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* ─── SCROLL INDICATOR ───────────────────────── */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            right: 2.5rem;
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 1s 1.4s ease forwards;
+        }
+
+        .scroll-indicator span {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            writing-mode: vertical-rl;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, var(--gold), transparent);
+            animation: scrollAnim 2s ease infinite;
+        }
+
+        @keyframes scrollAnim {
+            0%   { transform: scaleY(0); transform-origin: top; }
+            50%  { transform: scaleY(1); transform-origin: top; }
+            51%  { transform: scaleY(1); transform-origin: bottom; }
+            100% { transform: scaleY(0); transform-origin: bottom; }
+        }
+
+        /* ─── SECTION COMMONS ────────────────────────── */
+        section { position: relative; }
+
+        .section-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .section-heading {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.2rem, 4vw, 3.5rem);
+            font-weight: 400;
+            line-height: 1.15;
+            color: var(--white);
+            margin-bottom: 1.2rem;
+        }
+
+        .section-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.55);
+            max-width: 560px;
+        }
+
+        /* ─── FEATURES SECTION ───────────────────────── */
+        .features {
+            padding: 8rem 0;
+            background: linear-gradient(180deg, var(--navy) 0%, var(--navy-mid) 100%);
+        }
+
+        .features-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+        }
+
+        .features-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: end;
+            margin-bottom: 5rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5px;
+            background: var(--glass-border);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .feature-card {
+            background: rgba(10, 22, 40, 0.9);
+            padding: 2.5rem;
+            position: relative;
+            transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.45s;
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            transform: scaleX(0);
+            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .feature-card:hover {
+            background: rgba(15, 32, 64, 0.95);
+        }
+
+        .feature-card:hover::before { opacity: 1; }
+        .feature-card:hover::after { transform: scaleX(1); }
+
+        .feature-icon-wrap {
+            width: 52px; height: 52px;
+            border-radius: 10px;
+            background: rgba(201,168,76,0.1);
+            border: 1px solid rgba(201,168,76,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.45s;
+        }
+
+        .feature-card:hover .feature-icon-wrap {
+            background: rgba(201,168,76,0.18);
+            border-color: rgba(201,168,76,0.45);
+            transform: scale(1.05);
+        }
+
+        .feature-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-desc {
+            font-size: 0.88rem;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.45);
+        }
+
+        .feature-arrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            color: var(--gold);
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            margin-top: 1.2rem;
+            opacity: 0;
+            transform: translateX(-8px);
+            transition: all 0.35s;
+        }
+
+        .feature-card:hover .feature-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ─── MARQUEE STRIP ──────────────────────────── */
+        .marquee-section {
+            overflow: hidden;
+            border-top: 1px solid rgba(201,168,76,0.12);
+            border-bottom: 1px solid rgba(201,168,76,0.12);
+            padding: 1.2rem 0;
+            background: rgba(201,168,76,0.03);
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 3rem;
+            animation: marquee 25s linear infinite;
+            white-space: nowrap;
+        }
+
+        .marquee-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            flex-shrink: 0;
+        }
+
+        .marquee-dot {
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: var(--gold);
+            opacity: 0.6;
+        }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        /* ─── ABOUT / VIDEO FEATURE SECTION ─────────── */
+        .about-section {
+            padding: 8rem 0;
+            background: var(--navy);
+        }
+
+        .about-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+            align-items: center;
+        }
+
+        .about-visual {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+
+        .about-visual video,
+        .about-visual .video-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-placeholder {
+            background: linear-gradient(135deg, #0f2040 0%, #1a3a5c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .about-visual::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(135deg, rgba(201,168,76,0.12) 0%, transparent 50%);
+        }
+
+        .about-visual-border {
+            position: absolute;
+            inset: -1px;
+            border: 1px solid var(--glass-border);
+            border-radius: 13px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .about-corner {
+            position: absolute;
+            width: 24px; height: 24px;
+            border-color: var(--gold);
+            border-style: solid;
+            z-index: 3;
+        }
+
+        .about-corner.tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+        .about-corner.tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+        .about-corner.bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+        .about-corner.br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+
+        .play-btn {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            width: 70px; height: 70px;
+            background: rgba(201,168,76,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.35s;
+            border: none;
+        }
+
+        .play-btn::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 1px solid rgba(201,168,76,0.3);
+            animation: ripple 2.5s ease infinite;
+        }
+
+        .play-btn::after {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            border-radius: 50%;
+            border: 1px solid rgba(201,168,76,0.15);
+            animation: ripple 2.5s ease 0.5s infinite;
+        }
+
+        @keyframes ripple {
+            0%   { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        .play-btn:hover {
+            background: var(--gold-light);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .play-icon {
+            width: 0; height: 0;
+            border-top: 11px solid transparent;
+            border-bottom: 11px solid transparent;
+            border-left: 18px solid var(--navy);
+            margin-left: 4px;
+        }
+
+        /* ─── ANNOUNCEMENTS ──────────────────────────── */
+        .announcements {
+            padding: 8rem 0;
+            background: var(--navy-mid);
+        }
+
+        .announcements-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+        }
+
+        .ann-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3.5rem;
+        }
+
+        .ann-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .ann-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ann-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+        }
+
+        .ann-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(201,168,76,0.4);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .ann-tag {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: rgba(201,168,76,0.1);
+            border-radius: 3px;
+            padding: 0.25rem 0.7rem;
+            margin-bottom: 1rem;
+        }
+
+        .ann-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .ann-text {
+            font-size: 0.86rem;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 1.5rem;
+        }
+
+        .ann-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* ─── CTA SECTION ────────────────────────────── */
+        .cta-section {
+            padding: 8rem 0;
+            background: var(--navy);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-glow {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 400px;
+            background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+        }
+
+        .cta-inner .section-heading { margin-bottom: 1.5rem; }
+        .cta-inner .section-text {
+            max-width: none;
+            margin: 0 auto 3rem;
+            text-align: center;
+        }
+
+        .cta-btns {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* ─── FOOTER ─────────────────────────────────── */
+        .footer {
+            background: rgba(6, 14, 26, 0.95);
+            border-top: 1px solid rgba(201,168,76,0.12);
+            padding: 4rem 0 2rem;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand p {
+            font-size: 0.88rem;
+            line-height: 1.75;
+            color: rgba(255,255,255,0.4);
+            margin-top: 1.2rem;
+            max-width: 280px;
+        }
+
+        .footer-col h4 {
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1.2rem;
+        }
+
+        .footer-col a {
+            display: block;
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            margin-bottom: 0.6rem;
+            transition: color 0.3s;
+        }
+
+        .footer-col a:hover { color: rgba(255,255,255,0.8); }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.07);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-bottom p {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.25);
+        }
+
+        /* ─── ANIMATIONS ─────────────────────────────── */
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-left.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-right.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        [data-delay="1"] { transition-delay: 0.1s; }
+        [data-delay="2"] { transition-delay: 0.2s; }
+        [data-delay="3"] { transition-delay: 0.3s; }
+        [data-delay="4"] { transition-delay: 0.4s; }
+        [data-delay="5"] { transition-delay: 0.5s; }
+        [data-delay="6"] { transition-delay: 0.6s; }
+
+        /* ─── RESPONSIVE ─────────────────────────────── */
+        @media (max-width: 1024px) {
+            .features-header { grid-template-columns: 1fr; gap: 1.5rem; }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .about-inner { grid-template-columns: 1fr; gap: 3rem; }
+            .footer-top { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .features-grid { grid-template-columns: 1fr; }
+            .ann-grid { grid-template-columns: 1fr; }
+            .hero-stats-strip { flex-direction: column; gap: 2rem; }
+            .hero-stat { border-right: none; padding: 0 !important; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1.5rem !important; }
+            .hero-stat:last-child { border-bottom: none; }
+            .footer-top { grid-template-columns: 1fr; }
+            .cta-btns { flex-direction: column; align-items: center; }
+            .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════ NAVBAR ════════════════════════════════ -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-inner">
+            <a href="#home" class="logo">
+                <div class="logo-emblem">SC</div>
+                <div class="logo-text">
+                    <strong>SmartCampus</strong>
+                    <span>City University</span>
+                </div>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#announcements">News</a></li>
+            </ul>
+
+            <div class="nav-cta">
+                <a href="/login" class="btn btn-ghost">Login</a>
+                <a href="/register" class="btn btn-gold">Register Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══════ HERO ═══════════════════════════════════ -->
+    <section class="hero" id="home">
+        <div class="hero-video-wrap">
+            <!--
+                REPLACE src WITH YOUR VIDEO FILE PATH e.g. src="/videos/campus.mp4"
+                Recommended: 1920×1080, H.264, ~5–15s loop, no audio
+            -->
+            <video
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="auto"
+                src="/videos/campus-hero.mp4"
+                poster="/images/campus-poster.jpg">
+            </video>
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-grain"></div>
+
+        <div style="position:relative; z-index:4; width:100%;">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    Established 1985 · Peshawar, KPK
+                </div>
+
+                <h1 class="hero-title">
+                    Where <em>Knowledge</em><br>Shapes the Future
+                </h1>
+
+                <p class="hero-sub">City University of Science &amp; Information Technology</p>
+
+                <p class="hero-desc">
+                    A centralized digital campus management system designed to connect students, faculty, and administration — seamlessly and intelligently.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="/register" class="btn btn-gold btn-large">Begin Your Journey</a>
+                    <a href="#features" class="btn btn-ghost btn-large">Explore Portal</a>
+                </div>
+            </div>
+
+            <div class="hero-stats-strip">
+                <div class="hero-stat">
+                    <div class="stat-num" data-target="1000">0</div>
+                    <div class="stat-label">Active Students</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="stat-num" data-target="500">0</div>
+                    <div class="stat-label">Resolved Complaints</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="stat-num" data-target="50">0</div>
+                    <div class="stat-label">Events Hosted</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="stat-num" data-target="100">0</div>
+                    <div class="stat-label">FYP Projects</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scroll-indicator">
+            <div class="scroll-line"></div>
+            <span>Scroll</span>
+        </div>
+    </section>
+
+    <!-- ═══════ MARQUEE ════════════════════════════════ -->
+    <div class="marquee-section">
+        <div class="marquee-track">
+            <div class="marquee-item"><span class="marquee-dot"></span> Complaint Management</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> Event Registration</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> FYP Management</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> Live Announcements</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> Admin Analytics</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> Secure Role Access</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> Complaint Management</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> Event Registration</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> FYP Management</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> Live Announcements</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> Admin Analytics</div>
+            <div class="marquee-item"><span class="marquee-dot"></span> Secure Role Access</div>
+        </div>
+    </div>
+
+    <!-- ═══════ FEATURES ═══════════════════════════════ -->
+    <section class="features" id="features">
+        <div class="features-inner">
+            <div class="features-header">
+                <div class="reveal-left">
+                    <div class="section-label">Platform Capabilities</div>
+                    <h2 class="section-heading">Everything you need.<br>In one portal.</h2>
+                </div>
+                <div class="reveal-right">
+                    <p class="section-text" style="text-align:right;">Our integrated campus management platform brings together six core systems to streamline university life for every stakeholder.</p>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card reveal" data-delay="1">
+                    <div class="feature-icon-wrap">📋</div>
+                    <div class="feature-name">Complaint Management</div>
+                    <p class="feature-desc">Submit and track complaints with real-time status updates, admin responses, and resolution timelines.</p>
+                    <a href="/login" class="feature-arrow">Access Module →</a>
+                </div>
+
+                <div class="feature-card reveal" data-delay="2">
+                    <div class="feature-icon-wrap">🎉</div>
+                    <div class="feature-name">Event Registration</div>
+                    <p class="feature-desc">Discover campus events, register with one click, and monitor seat availability in real time.</p>
+                    <a href="/login" class="feature-arrow">Access Module →</a>
+                </div>
+
+                <div class="feature-card reveal" data-delay="3">
+                    <div class="feature-icon-wrap">📚</div>
+                    <div class="feature-name">FYP Management</div>
+                    <p class="feature-desc">Manage Final Year Projects from proposal to defense — milestones, supervisor assignments, and progress tracking.</p>
+                    <a href="/login" class="feature-arrow">Access Module →</a>
+                </div>
+
+                <div class="feature-card reveal" data-delay="4">
+                    <div class="feature-icon-wrap">📢</div>
+                    <div class="feature-name">Announcements</div>
+                    <p class="feature-desc">Stay informed with prioritized campus notices, academic calendars, and department-specific alerts.</p>
+                    <a href="/login" class="feature-arrow">Access Module →</a>
+                </div>
+
+                <div class="feature-card reveal" data-delay="5">
+                    <div class="feature-icon-wrap">📊</div>
+                    <div class="feature-name">Analytics Dashboard</div>
+                    <p class="feature-desc">Comprehensive data insights, usage statistics, and reporting tools for campus administrators.</p>
+                    <a href="/login" class="feature-arrow">Access Module →</a>
+                </div>
+
+                <div class="feature-card reveal" data-delay="6">
+                    <div class="feature-icon-wrap">🔒</div>
+                    <div class="feature-name">Secure Role Access</div>
+                    <p class="feature-desc">Granular role-based access control with encrypted data protection for students, faculty, and staff.</p>
+                    <a href="/login" class="feature-arrow">Access Module →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ ABOUT / VIDEO SECTION ════════════════= -->
+    <section class="about-section" id="about">
+        <div class="about-inner">
+            <div class="about-visual reveal-left">
+                <!--
+                    REPLACE src WITH YOUR SECOND VIDEO e.g. src="/videos/campus-tour.mp4"
+                    Or remove the <video> tag and use the placeholder div below
+                -->
+                <video autoplay muted loop playsinline src="/publlic/videos/city.mp4" poster="/publlic/images/city.jpg"></video>
+                <!-- Fallback placeholder (remove if using real video):
+                <div class="video-placeholder">🎓</div>
+                -->
+                <div class="about-visual-border"></div>
+                <div class="about-corner tl"></div>
+                <div class="about-corner tr"></div>
+                <div class="about-corner bl"></div>
+                <div class="about-corner br"></div>
+                <button class="play-btn" onclick="this.closest('.about-visual').querySelector('video').play()">
+                    <div class="play-icon"></div>
+                </button>
+            </div>
+
+            <div class="reveal-right">
+                <div class="section-label">Our Institution</div>
+                <h2 class="section-heading">A legacy of<br>academic excellence.</h2>
+                <p class="section-text" style="margin-bottom:2rem;">
+                    Founded in 1985, City University of Science &amp; Information Technology has stood at the forefront of higher education in Khyber Pakhtunkhwa — nurturing scholars, innovators, and leaders.
+                </p>
+                <p class="section-text" style="margin-bottom:2.5rem;">
+                    The SmartCampus Portal is our commitment to a fully digital, transparent, and responsive university experience for every member of our community.
+                </p>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2.5rem;">
+                    <div style="padding:1.2rem; border:1px solid rgba(201,168,76,0.2); border-radius:8px; background:var(--glass);">
+                        <div style="font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--gold); font-weight:600;">40+</div>
+                        <div style="font-size:0.8rem; color:rgba(255,255,255,0.45); margin-top:0.25rem;">Years of Excellence</div>
+                    </div>
+                    <div style="padding:1.2rem; border:1px solid rgba(201,168,76,0.2); border-radius:8px; background:var(--glass);">
+                        <div style="font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--gold); font-weight:600;">15+</div>
+                        <div style="font-size:0.8rem; color:rgba(255,255,255,0.45); margin-top:0.25rem;">Academic Departments</div>
+                    </div>
+                </div>
+
+                <a href="/register" class="btn btn-gold btn-large">Join SmartCampus</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ ANNOUNCEMENTS ══════════════════════════ -->
+    <section class="announcements" id="announcements">
+        <div class="announcements-inner">
+            <div class="ann-header reveal">
+                <div>
+                    <div class="section-label">Latest Updates</div>
+                    <h2 class="section-heading">Campus Announcements</h2>
+                </div>
+                <a href="/login" class="btn btn-ghost">View All News</a>
+            </div>
+
+            <div class="ann-grid">
+                <div class="ann-card reveal" data-delay="1">
+                    <span class="ann-tag">Academic</span>
+                    <h3 class="ann-title">Final Year Project Submission Deadline Extended</h3>
+                    <p class="ann-text">All FYP groups must submit their final reports and documentation through the SmartCampus portal by the revised deadline.</p>
+                    <div class="ann-meta">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        May 10, 2025
+                    </div>
+                </div>
+
+                <div class="ann-card reveal" data-delay="2">
+                    <span class="ann-tag">Event</span>
+                    <h3 class="ann-title">Annual Technology Expo — Registration Open</h3>
+                    <p class="ann-text">Students and faculty are invited to register for the Annual Tech Expo. Limited seats available — register through the Events module now.</p>
+                    <div class="ann-meta">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        May 8, 2025
+                    </div>
+                </div>
+
+                <div class="ann-card reveal" data-delay="3">
+                    <span class="ann-tag">Notice</span>
+                    <h3 class="ann-title">Mid-Term Examination Schedule Released</h3>
+                    <p class="ann-text">The mid-term examination timetable has been published. Students can access their individual schedules through the student portal.</p>
+                    <div class="ann-meta">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        May 5, 2025
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ CTA ════════════════════════════════════ -->
+    <section class="cta-section">
+        <div class="cta-glow"></div>
+        <div class="cta-inner reveal">
+            <div class="section-label">Get Started Today</div>
+            <h2 class="section-heading">Your campus,<br><em style="font-family:'Cormorant Garamond',serif; color:var(--gold-light);">reimagined.</em></h2>
+            <p class="section-text">
+                Join thousands of students and faculty who are already experiencing a smarter, more connected campus life through the SmartCampus Portal.
+            </p>
+            <div class="cta-btns">
+                <a href="/register" class="btn btn-gold btn-large">Create Your Account</a>
+                <a href="/login" class="btn btn-ghost btn-large">Sign In</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ FOOTER ════════════════════════════════ -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="#home" class="logo" style="margin-bottom:0.5rem; display:inline-flex;">
+                        <div class="logo-emblem">SC</div>
+                        <div class="logo-text">
+                            <strong>SmartCampus</strong>
+                            <span>City University</span>
+                        </div>
+                    </a>
+                    <p>Centralized digital campus management system for City University of Science &amp; Information Technology, Peshawar.</p>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Platform</h4>
+                    <a href="/login">Complaints</a>
+                    <a href="/login">Events</a>
+                    <a href="/login">FYP Portal</a>
+                    <a href="/login">Announcements</a>
+                    <a href="/login">Analytics</a>
+                </div>
+
+                <div class="footer-col">
+                    <h4>University</h4>
+                    <a href="#">About CUSIT</a>
+                    <a href="#">Departments</a>
+                    <a href="#">Faculty</a>
+                    <a href="#">Admissions</a>
+                    <a href="#">Research</a>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <a href="#">Help Center</a>
+                    <a href="#">Contact IT</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Use</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2025 City University of Science &amp; Information Technology. All rights reserved.</p>
+                <p>SmartCampus Portal · Peshawar, KPK, Pakistan</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ═══════ SCRIPTS ════════════════════════════════ -->
+    <script>
+        // ── Navbar scroll effect ─────────────────────
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 60);
+        }, { passive: true });
+
+        // ── Scroll reveal ────────────────────────────
+        const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+        revealEls.forEach(el => revealObserver.observe(el));
+
+        // ── Counter animation ────────────────────────
+        function animateCount(el, target, duration = 1800) {
+            let start = null;
+            const suffix = target >= 100 ? '+' : '+';
+            const step = (ts) => {
+                if (!start) start = ts;
+                const progress = Math.min((ts - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                el.textContent = Math.floor(eased * target).toLocaleString() + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        }
+
+        const statEls = document.querySelectorAll('.stat-num[data-target]');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCount(entry.target, parseInt(entry.target.dataset.target));
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        statEls.forEach(el => counterObserver.observe(el));
+
+        // ── Smooth scroll for hash links ─────────────
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', (e) => {
+                const target = document.querySelector(a.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // ── Parallax on hero grain ───────────────────
+        const grain = document.querySelector('.hero-grain');
+        window.addEventListener('scroll', () => {
+            const y = window.scrollY;
+            if (grain) grain.style.transform = `translateY(${y * 0.1}px)`;
+        }, { passive: true });
+    </script>
+</body>
+</html>
