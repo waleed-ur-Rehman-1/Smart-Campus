@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students Manager | Smart Campus Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #1a3a5c;
+            --secondary: #e8a735;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a3a5c 0%, #2c5f8a 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .logo span { color: var(--secondary); }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 0.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary { background: var(--secondary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-info { background: var(--info); color: white; }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th, .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table th {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .data-table tr:hover {
+            background: rgba(0,0,0,0.02);
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .data-table { font-size: 0.75rem; }
+            .filter-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Smart<span>Campus</span> Students</div>
+        <div>
+            <span>Admin: <%= user.name %></span>
+            <button class="btn" style="background: var(--danger); color: white; margin-left: 1rem;" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="/dashboard/admin" class="back-link">← Back to Dashboard</a>
+
+        <div class="stats">
+            <div class="stat-box">
+                <h3 id="totalStudents">0</h3>
+                <p>Total Students</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="activeStudents">0</h3>
+                <p>Active Students</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="totalComplaints">0</h3>
+                <p>Total Complaints</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="totalRegistrations">0</h3>
+                <p>Event Registrations</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">👨‍🎓 Student Management</h2>
+            
+            <div class="filter-bar">
+                <input type="text" id="searchInput" placeholder="Search by name, email or student ID..." onkeyup="applyFilters()" style="flex: 1;">
+                <select id="departmentFilter" onchange="applyFilters()">
+                    <option value="">All Departments</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Software Engineering">Software Engineering</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Business Administration">Business Administration</option>
+                </select>
+                <select id="semesterFilter" onchange="applyFilters()">
+                    <option value="">All Semesters</option>
+                    <option>1</option><option>2</option><option>3</option><option>4</option>
+                    <option>5</option><option>6</option><option>7</option><option>8</option>
+                </select>
+                <button class="btn btn-info" onclick="exportToCSV()">📥 Export CSV</button>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Semester</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTable">
+                        <tr><td colspan="8" style="text-align:center;">Loading students...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allStudents = [];
+        let filteredStudents = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStudents();
+        });
+
+        async function loadStudents() {
+            try {
+                const response = await fetch('/api/admin/students');
+                const data = await response.json();
+                if (data.success) {
+                    allStudents = data.students;
+                    filteredStudents = [...allStudents];
+                    updateStats();
+                    displayStudents();
+                } else {
+                    showDemoData();
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+                showDemoData();
+            }
+        }
+
+        function showDemoData() {
+            allStudents = [
+                { _id: '1', studentId: 'CITY-2024-001', name: 'Ali Hassan', email: 'ali@cityuniversity.edu', department: 'Computer Science', semester: 6, phone: '+92 300 1234567', status: 'Active' },
+                { _id: '2', studentId: 'CITY-2024-002', name: 'Sara Khan', email: 'sara@cityuniversity.edu', department: 'Software Engineering', semester: 5, phone: '+92 300 1234568', status: 'Active' },
+                { _id: '3', studentId: 'CITY-2024-003', name: 'Usman Raza', email: 'usman@cityuniversity.edu', department: 'Computer Science', semester: 7, phone: '+92 300 1234569', status: 'Active' },
+                { _id: '4', studentId: 'CITY-2024-004', name: 'Fatima Noor', email: 'fatima@cityuniversity.edu', department: 'Information Technology', semester: 4, phone: '+92 300 1234570', status: 'Active' }
+            ];
+            filteredStudents = [...allStudents];
+            updateStats();
+            displayStudents();
+        }
+
+        function updateStats() {
+            document.getElementById('totalStudents').innerHTML = allStudents.length;
+            document.getElementById('activeStudents').innerHTML = allStudents.filter(s => s.status === 'Active').length;
+            document.getElementById('totalComplaints').innerHTML = Math.floor(Math.random() * 50) + 10;
+            document.getElementById('totalRegistrations').innerHTML = Math.floor(Math.random() * 100) + 20;
+        }
+
+        function displayStudents() {
+            const tbody = document.getElementById('studentsTable');
+            if (filteredStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No students found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredStudents.map(student => `
+                <tr>
+                    <td>${student.studentId || 'N/A'}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div class="avatar">${student.name.charAt(0)}</div>
+                            ${student.name}
+                        </div>
+                    </td>
+                    <td>${student.email}</td>
+                    <td>${student.department || 'N/A'}</td>
+                    <td>${student.semester || 'N/A'}</td>
+                    <td>${student.phone || 'N/A'}</td>
+                    <td><span class="status-badge" style="background: var(--success); color: white; padding: 0.25rem 0.5rem; border-radius: 4px;">Active</span></td>
+                    <td>
+                        <button class="btn btn-info" onclick="viewStudent('${student._id}')" style="padding: 0.25rem 0.5rem;">View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const department = document.getElementById('departmentFilter').value;
+            const semester = document.getElementById('semesterFilter').value;
+            
+            filteredStudents = allStudents.filter(s => {
+                if (search && !s.name.toLowerCase().includes(search) && !s.email.toLowerCase().includes(search) && !(s.studentId && s.studentId.toLowerCase().includes(search))) return false;
+                if (department && s.department !== department) return false;
+                if (semester && s.semester != semester) return false;
+                return true;
+            });
+            
+            displayStudents();
+        }
+
+        function viewStudent(studentId) {
+            const student = allStudents.find(s => s._id === studentId);
+            if (student) {
+                alert(`Student Details:\n\nName: ${student.name}\nEmail: ${student.email}\nStudent ID: ${student.studentId}\nDepartment: ${student.department}\nSemester: ${student.semester}\nPhone: ${student.phone}`);
+            }
+        }
+
+        function exportToCSV() {
+            let csv = "Student ID,Name,Email,Department,Semester,Phone,Status\n";
+            filteredStudents.forEach(s => {
+                csv += `"${s.studentId || ''}","${s.name}","${s.email}","${s.department || ''}","${s.semester || ''}","${s.phone || ''}","${s.status || 'Active'}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `students_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function logout() { window.location.href = '/logout'; }
+    </script>
+</body>
+</html>

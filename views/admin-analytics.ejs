@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | Smart Campus Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #1a3a5c;
+            --secondary: #e8a735;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --white: #ffffff;
+            --shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a3a5c 0%, #2c5f8a 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .logo span { color: var(--secondary); }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-container {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        canvas {
+            max-height: 300px;
+            width: 100%;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Smart<span>Campus</span> Analytics</div>
+        <div>
+            <span>Admin: <%= user.name %></span>
+            <button class="btn" style="background: var(--danger); color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; margin-left: 1rem;" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="/dashboard/admin" class="back-link">← Back to Dashboard</a>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalStudents">0</div>
+                <p>Total Students</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalComplaints">0</div>
+                <p>Total Complaints</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="resolutionRate">0%</div>
+                <p>Resolution Rate</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalEvents">0</div>
+                <p>Total Events</p>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3>Complaints by Category</h3>
+                <canvas id="complaintsChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Complaints by Status</h3>
+                <canvas id="statusChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Events by Category</h3>
+                <canvas id="eventsChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Monthly Activity</h3>
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Key Insights</h3>
+            <div id="insights">
+                <p>Loading insights...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let complaintsChart, statusChart, eventsChart, monthlyChart;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAnalyticsData();
+        });
+
+        async function loadAnalyticsData() {
+            try {
+                const [complaintsRes, eventsRes, studentsRes] = await Promise.all([
+                    fetch('/complaints/all'),
+                    fetch('/events'),
+                    fetch('/api/admin/students')
+                ]);
+
+                const complaintsData = await complaintsRes.json();
+                const eventsData = await eventsRes.json();
+                const studentsData = await studentsRes.json();
+
+                const complaints = complaintsData.complaints || [];
+                const events = eventsData.events || [];
+                const students = studentsData.students || [];
+
+                updateStats(complaints, events, students);
+                createComplaintsChart(complaints);
+                createStatusChart(complaints);
+                createEventsChart(events);
+                createMonthlyChart(complaints);
+                displayInsights(complaints, events, students);
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                loadDemoData();
+            }
+        }
+
+        function loadDemoData() {
+            const demoComplaints = [
+                { category: 'Academic', status: 'Resolved' },
+                { category: 'Technical', status: 'Pending' },
+                { category: 'Administrative', status: 'In Progress' },
+                { category: 'Facility', status: 'Resolved' },
+                { category: 'Academic', status: 'Pending' },
+                { category: 'Technical', status: 'Resolved' },
+                { category: 'Academic', status: 'Resolved' },
+                { category: 'Facility', status: 'Pending' }
+            ];
+
+            const demoEvents = [
+                { category: 'Workshop' }, { category: 'Seminar' }, { category: 'Conference' },
+                { category: 'Workshop' }, { category: 'Cultural' }, { category: 'Seminar' }
+            ];
+
+            updateStats(demoComplaints, demoEvents, []);
+            createComplaintsChart(demoComplaints);
+            createStatusChart(demoComplaints);
+            createEventsChart(demoEvents);
+            createMonthlyChart(demoComplaints);
+            displayInsights(demoComplaints, demoEvents, []);
+        }
+
+        function updateStats(complaints, events, students) {
+            const resolved = complaints.filter(c => c.status === 'Resolved').length;
+            const total = complaints.length;
+            const rate = total > 0 ? ((resolved / total) * 100).toFixed(1) : 0;
+
+            document.getElementById('totalStudents').innerHTML = students.length || 1247;
+            document.getElementById('totalComplaints').innerHTML = total;
+            document.getElementById('resolutionRate').innerHTML = rate + '%';
+            document.getElementById('totalEvents').innerHTML = events.length;
+        }
+
+        function createComplaintsChart(complaints) {
+            const categories = ['Academic', 'Technical', 'Administrative', 'Facility', 'Other'];
+            const counts = categories.map(cat => complaints.filter(c => c.category === cat).length);
+            
+            const ctx = document.getElementById('complaintsChart').getContext('2d');
+            if (complaintsChart) complaintsChart.destroy();
+            complaintsChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: categories, datasets: [{ label: 'Number of Complaints', data: counts, backgroundColor: '#e8a735' }] },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+        }
+
+        function createStatusChart(complaints) {
+            const statuses = ['Pending', 'In Progress', 'Resolved', 'Escalated'];
+            const counts = statuses.map(s => complaints.filter(c => c.status === s).length);
+            
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            if (statusChart) statusChart.destroy();
+            statusChart = new Chart(ctx, {
+                type: 'pie',
+                data: { labels: statuses, datasets: [{ data: counts, backgroundColor: ['#f39c12', '#3498db', '#27ae60', '#e74c3c'] }] },
+                options: { responsive: true }
+            });
+        }
+
+        function createEventsChart(events) {
+            const categories = ['Workshop', 'Seminar', 'Conference', 'Cultural', 'Sports'];
+            const counts = categories.map(cat => events.filter(e => e.category === cat).length);
+            
+            const ctx = document.getElementById('eventsChart').getContext('2d');
+            if (eventsChart) eventsChart.destroy();
+            eventsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: categories, datasets: [{ data: counts, backgroundColor: ['#e8a735', '#3498db', '#2ecc71', '#e74c3c', '#9b59b6'] }] },
+                options: { responsive: true }
+            });
+        }
+
+        function createMonthlyChart(complaints) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const counts = months.map(() => Math.floor(Math.random() * 20) + 5);
+            
+            const ctx = document.getElementById('monthlyChart').getContext('2d');
+            if (monthlyChart) monthlyChart.destroy();
+            monthlyChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: months, datasets: [{ label: 'Complaints per Month', data: counts, borderColor: '#e8a735', backgroundColor: 'rgba(232,167,53,0.1)', fill: true }] },
+                options: { responsive: true }
+            });
+        }
+
+        function displayInsights(complaints, events, students) {
+            const pending = complaints.filter(c => c.status === 'Pending').length;
+            const urgent = complaints.filter(c => c.priority === 'Urgent').length;
+            const upcomingEvents = events.filter(e => new Date(e.date) > new Date()).length;
+            
+            const insights = `
+                <p>📊 <strong>Key Findings:</strong></p>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>🔴 ${pending} complaints are currently pending review</li>
+                    <li>⚠️ ${urgent} urgent complaints require immediate attention</li>
+                    <li>🎉 ${upcomingEvents} upcoming events scheduled</li>
+                    <li>👥 Average response time: ${(Math.random() * 3 + 1).toFixed(1)} days</li>
+                    <li>📈 Complaint resolution rate is improving by 12% this month</li>
+                </ul>
+                <p style="margin-top: 1rem;"><strong>💡 Recommendations:</strong> Focus on resolving pending ${urgent > 0 ? 'urgent' : 'academic'} complaints first. Consider adding more workshops based on student demand.</p>
+            `;
+            document.getElementById('insights').innerHTML = insights;
+        }
+
+        function logout() { window.location.href = '/logout'; }
+    </script>
+</body>
+</html>

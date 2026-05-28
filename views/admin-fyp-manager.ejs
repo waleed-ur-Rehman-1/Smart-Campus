@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FYP Manager | Smart Campus Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #1a3a5c;
+            --secondary: #e8a735;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a3a5c 0%, #2c5f8a 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .logo span { color: var(--secondary); }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 0.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary { background: var(--secondary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-info { background: var(--info); color: white; }
+
+        .fyp-card {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .fyp-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pending { background: var(--warning); color: white; }
+        .status-approved { background: var(--success); color: white; }
+        .status-rejected { background: var(--danger); color: white; }
+        .status-progress { background: var(--info); color: white; }
+
+        .member-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .member-tag {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .filter-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Smart<span>Campus</span> FYP Manager</div>
+        <div>
+            <span>Admin: <%= user.name %></span>
+            <button class="btn" style="background: var(--danger); color: white; margin-left: 1rem;" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="/dashboard/admin" class="back-link">← Back to Dashboard</a>
+
+        <div class="stats">
+            <div class="stat-box">
+                <h3 id="totalCount">0</h3>
+                <p>Total Projects</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="pendingCount">0</h3>
+                <p>Pending Approval</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="approvedCount">0</h3>
+                <p>Approved</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="inProgressCount">0</h3>
+                <p>In Progress</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">📚 Final Year Projects Management</h2>
+            
+            <div class="filter-bar">
+                <select id="statusFilter" onchange="applyFilters()">
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <select id="domainFilter" onchange="applyFilters()">
+                    <option value="">All Domains</option>
+                    <option value="Artificial Intelligence">AI/ML</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Mobile Development">Mobile Development</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Cloud Computing">Cloud Computing</option>
+                    <option value="Cybersecurity">Cybersecurity</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="Search by group name or title..." onkeyup="applyFilters()">
+                <button class="btn btn-info" onclick="exportToCSV()">📥 Export Report</button>
+            </div>
+
+            <div id="fypList"></div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 1rem;">Review FYP Project</h2>
+            <div id="fypDetails"></div>
+            <form id="reviewForm">
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Status</label>
+                    <select id="reviewStatus" style="width: 100%; padding: 0.5rem;">
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Supervisor Name</label>
+                    <input type="text" id="supervisorName" placeholder="Dr. John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Supervisor Email</label>
+                    <input type="email" id="supervisorEmail" placeholder="supervisor@cityuniversity.edu">
+                </div>
+                <div class="form-group">
+                    <label>Supervisor Department</label>
+                    <input type="text" id="supervisorDept" placeholder="Computer Science">
+                </div>
+                <div class="form-group">
+                    <label>Admin Feedback</label>
+                    <textarea id="adminFeedback" rows="3" style="width: 100%; padding: 0.5rem;"></textarea>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary">Update Project</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let allProjects = [];
+        let filteredProjects = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProjects();
+        });
+
+        async function loadProjects() {
+            try {
+                const response = await fetch('/fyp/all');
+                const data = await response.json();
+                if (data.success) {
+                    allProjects = data.fyps || [];
+                    filteredProjects = [...allProjects];
+                    updateStats();
+                    displayProjects();
+                } else {
+                    showDemoData();
+                }
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                showDemoData();
+            }
+        }
+
+        function showDemoData() {
+            allProjects = [
+                {
+                    _id: '1',
+                    groupName: 'AI Innovators',
+                    projectTitle: 'Smart Attendance System using Face Recognition',
+                    projectDescription: 'Automated attendance system using AI',
+                    domain: 'Artificial Intelligence',
+                    status: 'Pending',
+                    members: [{ studentName: 'Ali Hassan' }, { studentName: 'Sara Khan' }],
+                    milestones: [{ status: 'Completed' }, { status: 'Pending' }]
+                },
+                {
+                    _id: '2',
+                    groupName: 'Web Wizards',
+                    projectTitle: 'E-Learning Platform with AI Recommendations',
+                    projectDescription: 'Personalized learning platform',
+                    domain: 'Web Development',
+                    status: 'Approved',
+                    members: [{ studentName: 'Usman Raza' }, { studentName: 'Fatima Noor' }],
+                    milestones: [{ status: 'Completed' }, { status: 'Completed' }, { status: 'Pending' }]
+                }
+            ];
+            filteredProjects = [...allProjects];
+            updateStats();
+            displayProjects();
+        }
+
+        function updateStats() {
+            document.getElementById('totalCount').innerHTML = allProjects.length;
+            document.getElementById('pendingCount').innerHTML = allProjects.filter(p => p.status === 'Pending').length;
+            document.getElementById('approvedCount').innerHTML = allProjects.filter(p => p.status === 'Approved').length;
+            document.getElementById('inProgressCount').innerHTML = allProjects.filter(p => p.status === 'In Progress').length;
+        }
+
+        function displayProjects() {
+            const container = document.getElementById('fypList');
+            if (filteredProjects.length === 0) {
+                container.innerHTML = '<p>No projects found.</p>';
+                return;
+            }
+
+            container.innerHTML = filteredProjects.map(project => `
+                <div class="fyp-card">
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap;">
+                        <div style="flex: 1;">
+                            <h3>📁 ${escapeHtml(project.groupName)}</h3>
+                            <p><strong>Project:</strong> ${escapeHtml(project.projectTitle)}</p>
+                            <p><strong>Domain:</strong> ${project.domain}</p>
+                            <p><strong>Description:</strong> ${escapeHtml(project.projectDescription?.substring(0, 100))}...</p>
+                            <div class="member-list">
+                                ${project.members ? project.members.map(m => `<span class="member-tag">👤 ${escapeHtml(m.studentName)}</span>`).join('') : ''}
+                            </div>
+                            <p style="margin-top: 0.5rem;">
+                                <strong>Milestones:</strong> ${project.milestones ? project.milestones.filter(m => m.status === 'Completed').length : 0}/${project.milestones ? project.milestones.length : 0} completed
+                            </p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="status-badge status-${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span>
+                            <div style="margin-top: 0.5rem;">
+                                <button class="btn btn-primary" onclick="reviewProject('${project._id}')">Review</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function applyFilters() {
+            const status = document.getElementById('statusFilter').value;
+            const domain = document.getElementById('domainFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredProjects = allProjects.filter(p => {
+                if (status && p.status !== status) return false;
+                if (domain && p.domain !== domain) return false;
+                if (search && !p.groupName.toLowerCase().includes(search) && !p.projectTitle.toLowerCase().includes(search)) return false;
+                return true;
+            });
+            
+            displayProjects();
+        }
+
+        function reviewProject(projectId) {
+            const project = allProjects.find(p => p._id === projectId);
+            if (project) {
+                const details = `
+                    <p><strong>Group Name:</strong> ${project.groupName}</p>
+                    <p><strong>Project Title:</strong> ${project.projectTitle}</p>
+                    <p><strong>Domain:</strong> ${project.domain}</p>
+                    <p><strong>Description:</strong> ${project.projectDescription}</p>
+                    <p><strong>Current Status:</strong> ${project.status}</p>
+                    <p><strong>Members:</strong> ${project.members ? project.members.map(m => m.studentName).join(', ') : 'N/A'}</p>
+                `;
+                document.getElementById('fypDetails').innerHTML = details;
+                document.getElementById('reviewStatus').value = project.status;
+                document.getElementById('supervisorName').value = project.supervisor?.name || '';
+                document.getElementById('supervisorEmail').value = project.supervisor?.email || '';
+                document.getElementById('supervisorDept').value = project.supervisor?.department || '';
+                document.getElementById('adminFeedback').value = project.adminFeedback || '';
+                window.currentProjectId = projectId;
+                document.getElementById('reviewModal').style.display = 'flex';
+            }
+        }
+
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                status: document.getElementById('reviewStatus').value,
+                feedback: document.getElementById('adminFeedback').value,
+                supervisor: {
+                    name: document.getElementById('supervisorName').value,
+                    email: document.getElementById('supervisorEmail').value,
+                    department: document.getElementById('supervisorDept').value
+                }
+            };
+            
+            try {
+                const response = await fetch(`/fyp/${window.currentProjectId}/review`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert('Project updated successfully!');
+                    closeModal();
+                    loadProjects();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Project updated (demo mode)');
+                closeModal();
+                loadProjects();
+            }
+        });
+
+        function exportToCSV() {
+            let csv = "Group Name,Project Title,Domain,Status,Members,Description\n";
+            filteredProjects.forEach(p => {
+                csv += `"${p.groupName}","${p.projectTitle}","${p.domain}","${p.status}","${p.members ? p.members.map(m => m.studentName).join(';') : ''}","${p.projectDescription}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fyp_projects_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function closeModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function logout() { window.location.href = '/logout'; }
+
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('reviewModal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

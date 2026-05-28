@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Student Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #080e1c;
+            --navy-2: #0c1525;
+            --navy-3: #101d33;
+            --navy-4: #162440;
+            --gold: #c9a84c;
+            --gold-light: #e8c97a;
+            --gold-pale: rgba(201, 168, 76, 0.12);
+            --gold-border: rgba(201, 168, 76, 0.22);
+            --white: #ffffff;
+            --text: rgba(255, 255, 255, 0.82);
+            --text-muted: rgba(255, 255, 255, 0.42);
+            --text-faint: rgba(255, 255, 255, 0.18);
+            --success: #2ecc82;
+            --success-bg: rgba(46, 204, 130, 0.12);
+            --danger: #e05c5c;
+            --danger-bg: rgba(224, 92, 92, 0.12);
+            --warning: #f0a845;
+            --warning-bg: rgba(240, 168, 69, 0.12);
+            --info: #5b9cf6;
+            --info-bg: rgba(91, 156, 246, 0.12);
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-hover: rgba(255, 255, 255, 0.07);
+            --card-border: rgba(255, 255, 255, 0.07);
+            --sidebar-w: 280px;
+            --topbar-h: 70px;
+            --shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--navy);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ═══ VIDEO BACKGROUND ══════════════════════════════════════ */
+        .bg-video-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-video-wrap video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.12;
+            filter: saturate(0.3) brightness(0.35);
+        }
+
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(201, 168, 76, 0.06) 0%, transparent 55%),
+                        radial-gradient(ellipse 60% 80% at 80% 80%, rgba(11, 28, 58, 0.95) 0%, transparent 60%),
+                        linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 50%, var(--navy) 100%);
+        }
+
+        .bg-grain {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px;
+            pointer-events: none;
+        }
+
+        /* ═══ TOPBAR ═══════════════════════════════════════════════ */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-h);
+            z-index: 100;
+            background: rgba(8, 14, 28, 0.85);
+            border-bottom: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo-emblem {
+            width: 38px;
+            height: 38px;
+            border: 1.5px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .logo-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .logo-text span {
+            color: var(--gold);
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: color 0.3s;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--gold);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-left: 1.5rem;
+            border-left: 1px solid var(--card-border);
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .user-role {
+            font-size: 0.65rem;
+            color: var(--gold);
+            letter-spacing: 0.08em;
+        }
+
+        .logout-btn {
+            background: rgba(224, 92, 92, 0.15);
+            border: 1px solid rgba(224, 92, 92, 0.3);
+            color: var(--danger);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(224, 92, 92, 0.25);
+            border-color: var(--danger);
+        }
+
+        /* ═══ MAIN CONTENT ════════════════════════════════════════ */
+        .main {
+            margin-top: var(--topbar-h);
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ═══ WELCOME SECTION ═════════════════════════════════════ */
+        .welcome-section {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.08), rgba(201, 168, 76, 0.02));
+            border: 1px solid var(--gold-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(201, 168, 76, 0.08), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .welcome-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .student-badge {
+            display: inline-block;
+            background: var(--gold-pale);
+            border: 1px solid var(--gold-border);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--gold-light);
+            margin-top: 1rem;
+        }
+
+        /* ═══ STATS GRID ══════════════════════════════════════════ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.3rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gold);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat-card:hover {
+            background: var(--glass-hover);
+            border-color: var(--gold-border);
+            transform: translateY(-4px);
+        }
+
+        .stat-card:hover::before {
+            opacity: 0.7;
+        }
+
+        .stat-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .stat-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* ═══ SECTIONS ═══════════════════════════════════════════ */
+        .section {
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .section:hover {
+            border-color: var(--gold-border);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .section-icon {
+            font-size: 1.1rem;
+        }
+
+        .section-action {
+            background: var(--gold-pale);
+            border: 1px solid var(--gold-border);
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--gold);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .section-action:hover {
+            background: rgba(201, 168, 76, 0.2);
+        }
+
+        .section-body {
+            padding: 1.2rem 1.5rem;
+        }
+
+        /* ═══ TABS ═══════════════════════════════════════════════ */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: var(--gold-pale);
+            border-color: var(--gold);
+            color: var(--gold-light);
+        }
+
+        /* ═══ CARDS & ITEMS ══════════════════════════════════════ */
+        .complaint-card, .event-card, .announcement-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .complaint-card:hover, .event-card:hover {
+            transform: translateX(4px);
+            border-color: var(--gold-border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--white);
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .badge-pending { background: var(--warning-bg); color: var(--warning); }
+        .badge-resolved { background: var(--success-bg); color: var(--success); }
+        .badge-progress { background: var(--info-bg); color: var(--info); }
+        .badge-urgent { background: var(--danger-bg); color: var(--danger); }
+        .badge-low { background: var(--success-bg); color: var(--success); }
+        .badge-medium { background: var(--warning-bg); color: var(--warning); }
+        .badge-high { background: var(--danger-bg); color: var(--danger); }
+
+        .card-content {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin: 0.5rem 0;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.65rem;
+            color: var(--text-faint);
+            margin-top: 0.5rem;
+        }
+
+        /* ═══ FORM STYLES ════════════════════════════════════════ */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--white);
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        /* ═══ BUTTONS ════════════════════════════════════════════ */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: var(--navy);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(201, 168, 76, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--danger-bg);
+            border: 1px solid rgba(224, 92, 92, 0.3);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: rgba(224, 92, 92, 0.2);
+            border-color: var(--danger);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gold-border);
+            color: var(--gold);
+        }
+
+        .btn-outline:hover {
+            background: var(--gold-pale);
+            border-color: var(--gold);
+        }
+
+        /* ═══ MODAL ══════════════════════════════════════════════ */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: rgba(8, 14, 28, 0.95);
+            border: 1px solid var(--gold-border);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+        }
+
+        /* ═══ TOAST ══════════════════════════════════════════════ */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ═══ LOADING ════════════════════════════════════════════ */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--card-border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ═══ RESPONSIVE ═════════════════════════════════════════ */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .main { padding: 1rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .topbar { padding: 0 1rem; }
+            .user-details { display: none; }
+            .welcome-title { font-size: 1.5rem; }
+        }
+
+        /* ═══ SCROLLBAR ══════════════════════════════════════════ */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--navy); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-border); border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ VIDEO BACKGROUND ══════════════════════════════════════ -->
+    <div class="bg-video-wrap">
+        <video autoplay muted loop playsinline id="bgVideo">
+            <source src="/videos/campus-admin.mp4" type="video/mp4">
+        </video>
+        <div class="bg-overlay"></div>
+    </div>
+    <div class="bg-grain"></div>
+
+    <!-- ═══ TOPBAR ═══════════════════════════════════════════════ -->
+    <header class="topbar">
+        <div class="logo">
+            <div class="logo-emblem">SC</div>
+            <div class="logo-text">Smart<span>Campus</span></div>
+        </div>
+        <div class="topbar-nav">
+            <a class="nav-link active" onclick="showSection('dashboard')">Dashboard</a>
+            <a class="nav-link" onclick="showSection('complaints')">Complaints</a>
+            <a class="nav-link" onclick="showSection('events')">Events</a>
+            <a class="nav-link" onclick="window.location.href='/fyp'">FYP</a>
+            <a class="nav-link" onclick="showSection('profile')">Profile</a>
+            <div class="user-info">
+                <div class="user-avatar"><%= user.name ? user.name.charAt(0).toUpperCase() : 'S' %></div>
+                <div class="user-details">
+                    <div class="user-name"><%= user.name %></div>
+                    <div class="user-role">Student</div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══ MAIN CONTENT ═════════════════════════════════════════ -->
+    <main class="main">
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1 class="welcome-title">Welcome back, <%= user.name %> 👋</h1>
+                <p class="welcome-subtitle">Your SmartCampus journey continues. Track complaints, discover events, and manage your FYP all in one place.</p>
+                <div class="student-badge">🎓 Student ID: <%= user.studentId %> • Computer Science • Semester 6</div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card" onclick="showSection('complaints')">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-value" id="activeComplaintsCount">0</div>
+                    <div class="stat-label">Active Complaints</div>
+                </div>
+                <div class="stat-card" onclick="showSection('events')">
+                    <div class="stat-icon">🎉</div>
+                    <div class="stat-value" id="registeredEventsCount">0</div>
+                    <div class="stat-label">Registered Events</div>
+                </div>
+                <div class="stat-card" onclick="window.location.href='/fyp'">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-value" id="fypStatus">-</div>
+                    <div class="stat-label">FYP Status</div>
+                </div>
+                <div class="stat-card" onclick="showSection('complaints')">
+                    <div class="stat-icon">🗂️</div>
+                    <div class="stat-value" id="totalComplaintsCount">0</div>
+                    <div class="stat-label">Total Complaints</div>
+                </div>
+            </div>
+
+            <!-- Latest Announcements -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="section-icon">📢</span>
+                        Latest Announcements
+                    </div>
+                </div>
+                <div class="section-body" id="latestAnnouncements">
+                    <div class="loading"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+            <!-- Recent Complaints -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="section-icon">📝</span>
+                        Recent Complaints
+                    </div>
+                    <button class="section-action" onclick="showSection('complaints')">View All →</button>
+                </div>
+                <div class="section-body" id="recentComplaints">
+                    <div class="loading"><div class="spinner"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complaints Section -->
+        <div id="complaintsSection" style="display: none;">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="section-icon">🎫</span>
+                        Complaint Management
+                    </div>
+                    <button class="section-action" onclick="showComplaintModal()">+ New Complaint</button>
+                </div>
+                <div class="section-body">
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="switchComplaintTab('all')">All Complaints</button>
+                        <button class="tab-btn" onclick="switchComplaintTab('pending')">Pending</button>
+                        <button class="tab-btn" onclick="switchComplaintTab('resolved')">Resolved</button>
+                    </div>
+                    <div id="complaintsList">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Section -->
+        <div id="eventsSection" style="display: none;">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="section-icon">🎉</span>
+                        Event Registration
+                    </div>
+                    <button class="section-action" onclick="refreshEvents()">🔄 Refresh</button>
+                </div>
+                <div class="section-body">
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="switchEventTab('available')">Available Events</button>
+                        <button class="tab-btn" onclick="switchEventTab('registered')">My Registrations</button>
+                    </div>
+                    <div id="eventsList">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profileSection" style="display: none;">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="section-icon">👤</span>
+                        My Profile
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="profileName" class="form-input" value="<%= user.name %>" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="profileEmail" class="form-input" value="<%= user.email %>" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Student ID</label>
+                        <input type="text" id="profileStudentId" class="form-input" value="<%= user.studentId %>" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <input type="text" id="profileDepartment" class="form-input" value="Computer Science">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" id="profilePhone" class="form-input" placeholder="Enter your phone number">
+                    </div>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
+                        <button class="btn btn-outline" onclick="showChangePasswordModal()">Change Password</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Complaint Modal -->
+    <div id="complaintModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Submit New Complaint</h2>
+            <form id="complaintForm">
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select id="complaintCategory" class="form-select" required>
+                        <option value="">Select Category</option>
+                        <option value="Academic">📚 Academic</option>
+                        <option value="Technical">💻 Technical</option>
+                        <option value="Administrative">📋 Administrative</option>
+                        <option value="Facility">🏢 Facility</option>
+                        <option value="Other">❓ Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select id="complaintPriority" class="form-select" required>
+                        <option value="Low">🟢 Low</option>
+                        <option value="Medium">🟡 Medium</option>
+                        <option value="High">🟠 High</option>
+                        <option value="Urgent">🔴 Urgent</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <input type="text" id="complaintTitle" class="form-input" required placeholder="Brief title of your complaint">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="complaintDescription" class="form-textarea" rows="5" required placeholder="Provide detailed description..."></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="closeComplaintModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Complaint</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Change Password</h2>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" id="currentPassword" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="newPassword" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" class="form-input" required>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-outline" onclick="closePasswordModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let allComplaints = [];
+        let allEvents = [];
+        let userRegistrations = [];
+
+        // Handle video background
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('bgVideo');
+            if (video) {
+                video.play().catch(() => {});
+            }
+            loadDashboardData();
+            loadComplaints();
+            refreshEvents();
+            loadAnnouncements();
+        });
+
+        async function loadDashboardData() {
+            await loadComplaints();
+            await loadFYPStatus();
+        }
+
+        async function loadFYPStatus() {
+            try {
+                const response = await fetch('/fyp/my-fyp');
+                const data = await response.json();
+                if (data.success && data.fyp) {
+                    const statusMap = {
+                        'Pending': '⏳ Pend',
+                        'Approved': '✅ Appr',
+                        'Rejected': '❌ Rej',
+                        'In Progress': '🚀 Prog',
+                        'Completed': '🏆 Done'
+                    };
+                    document.getElementById('fypStatus').innerHTML = statusMap[data.fyp.status] || '❌ Start';
+                } else {
+                    document.getElementById('fypStatus').innerHTML = '❌ Start';
+                }
+            } catch (error) {
+                document.getElementById('fypStatus').innerHTML = '❌ Err';
+            }
+        }
+
+        async function loadComplaints() {
+            try {
+                const response = await fetch('/complaints/my-complaints');
+                const data = await response.json();
+                if (data.success) {
+                    allComplaints = data.complaints;
+                    updateComplaintStats();
+                    displayComplaints(allComplaints);
+                    displayRecentComplaints();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function updateComplaintStats() {
+            const activeComplaints = allComplaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed').length;
+            document.getElementById('activeComplaintsCount').innerHTML = activeComplaints;
+            document.getElementById('totalComplaintsCount').innerHTML = allComplaints.length;
+        }
+
+        function displayComplaints(complaints) {
+            const container = document.getElementById('complaintsList');
+            if (!complaints || complaints.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted);">No complaints found. Click "New Complaint" to submit one.</div>';
+                return;
+            }
+
+            container.innerHTML = complaints.map(c => `
+                <div class="complaint-card">
+                    <div class="card-header">
+                        <span class="card-title">${escapeHtml(c.title)}</span>
+                        <div>
+                            <span class="badge badge-${c.status === 'Pending' ? 'pending' : c.status === 'Resolved' ? 'resolved' : 'progress'}">${c.status}</span>
+                            <span class="badge badge-${c.priority.toLowerCase()}">${c.priority}</span>
+                        </div>
+                    </div>
+                    <div class="card-content">${escapeHtml(c.description.substring(0, 120))}${c.description.length > 120 ? '...' : ''}</div>
+                    <div class="card-meta">
+                        <span>📁 ${c.category}</span>
+                        <span>📅 ${new Date(c.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    ${c.adminResponse ? `<div class="card-content" style="margin-top:0.5rem; background:rgba(46,204,130,0.08); padding:0.5rem; border-radius:8px;"><strong>📝 Response:</strong> ${escapeHtml(c.adminResponse)}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function displayRecentComplaints() {
+            const container = document.getElementById('recentComplaints');
+            const recent = allComplaints.slice(0, 3);
+            if (recent.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:1rem; color:var(--text-muted);">No complaints yet.</div>';
+                return;
+            }
+            container.innerHTML = recent.map(c => `
+                <div class="complaint-card">
+                    <div class="card-header">
+                        <span class="card-title">${escapeHtml(c.title)}</span>
+                        <span class="badge badge-${c.status === 'Pending' ? 'pending' : 'resolved'}">${c.status}</span>
+                    </div>
+                    <div class="card-meta">📅 ${new Date(c.createdAt).toLocaleDateString()}</div>
+                </div>
+            `).join('');
+        }
+
+        async function refreshEvents() {
+            try {
+                const response = await fetch('/events');
+                const data = await response.json();
+                if (data.success && data.events) {
+                    allEvents = data.events;
+                    displayEvents();
+                    loadUserRegistrations();
+                }
+            } catch (error) {
+                document.getElementById('eventsList').innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted);">Error loading events.</div>';
+            }
+        }
+
+        async function loadUserRegistrations() {
+            try {
+                const response = await fetch('/events');
+                const data = await response.json();
+                if (data.success && data.events) {
+                    userRegistrations = data.events.filter(event => 
+                        event.registeredStudents && event.registeredStudents.some(s => s.studentId === '<%= user.id %>')
+                    );
+                    document.getElementById('registeredEventsCount').innerHTML = userRegistrations.length;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function displayEvents() {
+            const container = document.getElementById('eventsList');
+            const activeTab = document.querySelector('#eventsSection .tab-btn.active')?.innerText || 'Available Events';
+            
+            if (activeTab === 'Available Events') {
+                displayAvailableEvents(container);
+            } else {
+                displayRegisteredEvents(container);
+            }
+        }
+
+        function displayAvailableEvents(container) {
+            const availableEvents = allEvents.filter(event => new Date(event.date) > new Date());
+            if (availableEvents.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted);">No upcoming events available.</div>';
+                return;
+            }
+            container.innerHTML = availableEvents.map(event => `
+                <div class="event-card">
+                    <div class="card-header">
+                        <span class="card-title">🎪 ${escapeHtml(event.title)}</span>
+                        <span class="badge badge-${event.availableSeats > 0 ? 'pending' : 'resolved'}">${event.availableSeats} seats left</span>
+                    </div>
+                    <div class="card-content">${escapeHtml(event.description)}</div>
+                    <div class="card-meta">
+                        <span>📅 ${new Date(event.date).toLocaleString()}</span>
+                        <span>📍 ${escapeHtml(event.location)}</span>
+                    </div>
+                    ${event.availableSeats > 0 ? 
+                        `<button class="btn btn-primary" style="margin-top:0.5rem; width:100%;" onclick="registerForEvent('${event._id}')">✅ Register Now</button>` : 
+                        '<button class="btn btn-outline" style="margin-top:0.5rem; width:100%;" disabled>❌ Sold Out</button>'}
+                </div>
+            `).join('');
+        }
+
+        function displayRegisteredEvents(container) {
+            if (userRegistrations.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted);">You haven\'t registered for any events yet.</div>';
+                return;
+            }
+            container.innerHTML = userRegistrations.map(event => `
+                <div class="event-card">
+                    <div class="card-header">
+                        <span class="card-title">🎪 ${escapeHtml(event.title)}</span>
+                    </div>
+                    <div class="card-content">${escapeHtml(event.description)}</div>
+                    <div class="card-meta">
+                        <span>📅 ${new Date(event.date).toLocaleString()}</span>
+                        <span>📍 ${escapeHtml(event.location)}</span>
+                    </div>
+                    <button class="btn btn-danger" style="margin-top:0.5rem; width:100%;" onclick="cancelRegistration('${event._id}')">❌ Cancel Registration</button>
+                </div>
+            `).join('');
+        }
+
+        async function registerForEvent(eventId) {
+            try {
+                const response = await fetch(`/events/${eventId}/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Successfully registered for the event!', 'success');
+                    refreshEvents();
+                } else {
+                    showToast('Registration failed: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error registering for event', 'error');
+            }
+        }
+
+        async function cancelRegistration(eventId) {
+            if (confirm('Cancel your registration?')) {
+                try {
+                    const response = await fetch(`/events/${eventId}/cancel`, { method: 'DELETE' });
+                    const result = await response.json();
+                    if (result.success) {
+                        showToast('Registration cancelled!', 'success');
+                        refreshEvents();
+                    } else {
+                        showToast('Cancellation failed', 'error');
+                    }
+                } catch (error) {
+                    showToast('Error cancelling', 'error');
+                }
+            }
+        }
+
+        document.getElementById('complaintForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                category: document.getElementById('complaintCategory').value,
+                priority: document.getElementById('complaintPriority').value,
+                title: document.getElementById('complaintTitle').value,
+                description: document.getElementById('complaintDescription').value
+            };
+            try {
+                const response = await fetch('/complaints/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Complaint submitted!', 'success');
+                    closeComplaintModal();
+                    document.getElementById('complaintForm').reset();
+                    loadComplaints();
+                } else {
+                    showToast('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error submitting complaint', 'error');
+            }
+        });
+
+        async function loadAnnouncements() {
+            try {
+                const response = await fetch('/announcements');
+                const data = await response.json();
+                if (data.success && data.announcements) {
+                    displayAnnouncements(data.announcements);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function displayAnnouncements(announcements) {
+            const container = document.getElementById('latestAnnouncements');
+            const recent = announcements.slice(0, 3);
+            if (recent.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:1rem; color:var(--text-muted);">No announcements available.</div>';
+                return;
+            }
+            container.innerHTML = recent.map(a => `
+                <div class="announcement-card">
+                    <div class="card-header">
+                        <span class="card-title">📢 ${escapeHtml(a.title)}</span>
+                        <span class="badge badge-${a.priority === 'Urgent' ? 'urgent' : a.priority === 'High' ? 'high' : 'medium'}">${a.priority}</span>
+                    </div>
+                    <div class="card-content">${escapeHtml(a.content.substring(0, 100))}${a.content.length > 100 ? '...' : ''}</div>
+                    <div class="card-meta">📅 ${new Date(a.createdAt).toLocaleDateString()}</div>
+                </div>
+            `).join('');
+        }
+
+        async function updateProfile() {
+            const phone = document.getElementById('profilePhone').value;
+            const department = document.getElementById('profileDepartment').value;
+            try {
+                const response = await fetch('/api/update-profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, department }) });
+                const result = await response.json();
+                showToast(result.success ? 'Profile updated!' : 'Update failed', result.success ? 'success' : 'error');
+            } catch (error) {
+                showToast('Error updating profile', 'error');
+            }
+        }
+
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (newPassword !== confirmPassword) {
+                showToast('Passwords do not match!', 'error');
+                return;
+            }
+            try {
+                const response = await fetch('/change-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+                    currentPassword: document.getElementById('currentPassword').value,
+                    newPassword: newPassword,
+                    confirmPassword: confirmPassword
+                })});
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Password changed!', 'success');
+                    closePasswordModal();
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    showToast('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error changing password', 'error');
+            }
+        });
+
+        function showSection(sectionName) {
+            document.querySelectorAll('#dashboardSection, #complaintsSection, #eventsSection, #profileSection').forEach(s => s.style.display = 'none');
+            document.getElementById(`${sectionName}Section`).style.display = 'block';
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            event.target.classList.add('active');
+            if (sectionName === 'events') refreshEvents();
+            else if (sectionName === 'complaints') loadComplaints();
+        }
+
+        function switchComplaintTab(tab) {
+            let filtered = allComplaints;
+            if (tab === 'pending') filtered = allComplaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed');
+            else if (tab === 'resolved') filtered = allComplaints.filter(c => c.status === 'Resolved' || c.status === 'Closed');
+            displayComplaints(filtered);
+        }
+
+        function switchEventTab(tab) {
+            const container = document.getElementById('eventsList');
+            if (tab === 'available') displayAvailableEvents(container);
+            else displayRegisteredEvents(container);
+        }
+
+        function showComplaintModal() { document.getElementById('complaintModal').style.display = 'flex'; }
+        function closeComplaintModal() { document.getElementById('complaintModal').style.display = 'none'; }
+        function showChangePasswordModal() { document.getElementById('passwordModal').style.display = 'flex'; }
+        function closePasswordModal() { document.getElementById('passwordModal').style.display = 'none'; }
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'success' ? '#2ecc82' : '#e05c5c';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function logout() { window.location.href = '/logout'; }
+        window.onclick = function(e) { if (e.target === document.getElementById('complaintModal')) closeComplaintModal(); if (e.target === document.getElementById('passwordModal')) closePasswordModal(); }
+    </script>
+</body>
+</html>

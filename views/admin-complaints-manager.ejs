@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaints Manager | Smart Campus Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #1a3a5c;
+            --secondary: #e8a735;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .logo span { color: var(--secondary); }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 0.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary { background: var(--secondary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-info { background: var(--info); color: white; }
+
+        .complaint-item {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .complaint-item:hover { transform: translateX(5px); box-shadow: var(--shadow); }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pending { background: var(--warning); color: white; }
+        .status-resolved { background: var(--success); color: white; }
+        .status-progress { background: var(--info); color: white; }
+        .status-escalated { background: var(--danger); color: white; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .filter-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Smart<span>Campus</span> Complaints</div>
+        <div>
+            <span>Admin: <%= user.name %></span>
+            <button class="btn" style="background: var(--danger); color: white; margin-left: 1rem;" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="/dashboard/admin" class="back-link">← Back to Dashboard</a>
+
+        <div class="stats">
+            <div class="stat-box" onclick="filterByStatus('')">
+                <h3 id="totalComplaints">0</h3>
+                <p>Total Complaints</p>
+            </div>
+            <div class="stat-box" onclick="filterByStatus('Pending')">
+                <h3 id="pendingComplaints">0</h3>
+                <p>Pending</p>
+            </div>
+            <div class="stat-box" onclick="filterByStatus('In Progress')">
+                <h3 id="inProgressComplaints">0</h3>
+                <p>In Progress</p>
+            </div>
+            <div class="stat-box" onclick="filterByStatus('Resolved')">
+                <h3 id="resolvedComplaints">0</h3>
+                <p>Resolved</p>
+            </div>
+            <div class="stat-box" onclick="filterByPriority('Urgent')">
+                <h3 id="urgentComplaints">0</h3>
+                <p>Urgent</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">📋 Manage Complaints</h2>
+            
+            <div class="filter-bar">
+                <select id="statusFilter" onchange="applyFilters()">
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                    <option value="Escalated">Escalated</option>
+                </select>
+                <select id="priorityFilter" onchange="applyFilters()">
+                    <option value="">All Priority</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Urgent">Urgent</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="Search by student name..." onkeyup="applyFilters()">
+                <button class="btn btn-info" onclick="exportToCSV()">📥 Export CSV</button>
+            </div>
+
+            <div id="complaintsList"></div>
+        </div>
+    </div>
+
+    <!-- View Complaint Modal -->
+    <div id="complaintModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 1rem;">Complaint Details</h2>
+            <div id="complaintDetails"></div>
+            <form id="responseForm">
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Admin Response</label>
+                    <textarea id="adminResponse" rows="3" style="width: 100%; padding: 0.5rem;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Update Status</label>
+                    <select id="updateStatus" style="width: 100%; padding: 0.5rem;">
+                        <option>Pending</option>
+                        <option>In Progress</option>
+                        <option>Resolved</option>
+                        <option>Escalated</option>
+                    </select>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let allComplaints = [];
+        let filteredComplaints = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadComplaints();
+        });
+
+        async function loadComplaints() {
+            try {
+                const response = await fetch('/complaints/all');
+                const data = await response.json();
+                if (data.success) {
+                    allComplaints = data.complaints;
+                    filteredComplaints = [...allComplaints];
+                    updateStats();
+                    displayComplaints();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalComplaints').innerHTML = allComplaints.length;
+            document.getElementById('pendingComplaints').innerHTML = allComplaints.filter(c => c.status === 'Pending').length;
+            document.getElementById('inProgressComplaints').innerHTML = allComplaints.filter(c => c.status === 'In Progress').length;
+            document.getElementById('resolvedComplaints').innerHTML = allComplaints.filter(c => c.status === 'Resolved').length;
+            document.getElementById('urgentComplaints').innerHTML = allComplaints.filter(c => c.priority === 'Urgent' && c.status !== 'Resolved').length;
+        }
+
+        function displayComplaints() {
+            const container = document.getElementById('complaintsList');
+            if (filteredComplaints.length === 0) {
+                container.innerHTML = '<p>No complaints found.</p>';
+                return;
+            }
+
+            container.innerHTML = filteredComplaints.map(complaint => `
+                <div class="complaint-item">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h3>📝 ${escapeHtml(complaint.title)}</h3>
+                            <p><strong>Student:</strong> ${escapeHtml(complaint.studentName)}</p>
+                            <p><strong>Category:</strong> ${complaint.category}</p>
+                            <p><strong>Priority:</strong> <span class="status-badge" style="background: ${getPriorityColor(complaint.priority)}">${complaint.priority}</span></p>
+                            <p><strong>Status:</strong> <span class="status-badge status-${complaint.status.toLowerCase().replace(' ', '-')}">${complaint.status}</span></p>
+                            <p><strong>Description:</strong> ${escapeHtml(complaint.description.substring(0, 150))}${complaint.description.length > 150 ? '...' : ''}</p>
+                            <small>Submitted: ${new Date(complaint.createdAt).toLocaleString()}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" onclick="viewComplaint('${complaint._id}')">View & Respond</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function applyFilters() {
+            const status = document.getElementById('statusFilter').value;
+            const priority = document.getElementById('priorityFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredComplaints = allComplaints.filter(c => {
+                if (status && c.status !== status) return false;
+                if (priority && c.priority !== priority) return false;
+                if (search && !c.studentName.toLowerCase().includes(search)) return false;
+                return true;
+            });
+            
+            displayComplaints();
+        }
+
+        function filterByStatus(status) {
+            document.getElementById('statusFilter').value = status;
+            applyFilters();
+        }
+
+        function filterByPriority(priority) {
+            document.getElementById('priorityFilter').value = priority;
+            applyFilters();
+        }
+
+        function viewComplaint(complaintId) {
+            const complaint = allComplaints.find(c => c._id === complaintId);
+            if (complaint) {
+                const details = `
+                    <p><strong>Student:</strong> ${complaint.studentName}</p>
+                    <p><strong>Student ID:</strong> ${complaint.studentId || 'N/A'}</p>
+                    <p><strong>Title:</strong> ${complaint.title}</p>
+                    <p><strong>Description:</strong> ${complaint.description}</p>
+                    <p><strong>Category:</strong> ${complaint.category}</p>
+                    <p><strong>Priority:</strong> ${complaint.priority}</p>
+                    <p><strong>Status:</strong> ${complaint.status}</p>
+                    <p><strong>Submitted:</strong> ${new Date(complaint.createdAt).toLocaleString()}</p>
+                    ${complaint.adminResponse ? `<p><strong>Previous Response:</strong> ${complaint.adminResponse}</p>` : ''}
+                `;
+                document.getElementById('complaintDetails').innerHTML = details;
+                document.getElementById('updateStatus').value = complaint.status;
+                document.getElementById('adminResponse').value = complaint.adminResponse || '';
+                window.currentComplaintId = complaintId;
+                document.getElementById('complaintModal').style.display = 'flex';
+            }
+        }
+
+        document.getElementById('responseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const response = document.getElementById('adminResponse').value;
+            const status = document.getElementById('updateStatus').value;
+            
+            try {
+                const res = await fetch(`/complaints/${window.currentComplaintId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, response })
+                });
+                
+                const result = await res.json();
+                if (result.success) {
+                    alert('Complaint updated successfully!');
+                    closeModal();
+                    loadComplaints();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        function exportToCSV() {
+            let csv = "Student Name,Title,Category,Priority,Status,Submitted Date,Admin Response\n";
+            filteredComplaints.forEach(c => {
+                csv += `"${c.studentName}","${c.title}","${c.category}","${c.priority}","${c.status}","${new Date(c.createdAt).toLocaleString()}","${c.adminResponse || ''}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `complaints_report_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function closeModal() {
+            document.getElementById('complaintModal').style.display = 'none';
+        }
+
+        function getPriorityColor(priority) {
+            const colors = { 'Low': '#3498db', 'Medium': '#f39c12', 'High': '#e67e22', 'Urgent': '#e74c3c' };
+            return colors[priority] || '#95a5a6';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function logout() { window.location.href = '/logout'; }
+
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('complaintModal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
