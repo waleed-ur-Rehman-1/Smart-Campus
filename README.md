@@ -1,2 +1,1 @@
-# Smart-Campus
-Smart Campus for university 
+A modern Smart Campus Management System built with the MERN Stack (MongoDB, Express.js, React.js, Node.js). This platform helps universities manage students, faculty, courses, attendance, announcements, events, and campus activities through a centralized digital system. It features a responsive UI, secure authentication, real-time data management, and an efficient dashboard for admins, teachers, and students.
